@@ -72,9 +72,14 @@ router.post("/login", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 // เส้นทางสำหรับการสมัครสมาชิก
 router.post("/register", (req, res) => {
     const { name, lastname, phone, password } = req.body; // รับค่า name, lastname, phone และ password จาก body
+
+    // กำหนดค่าเริ่มต้นสำหรับ address และ img
+    const address = 'ยังไม่เพิ่มที่อยู่';
+    const img = 'https://as1.ftcdn.net/v2/jpg/03/46/83/96/1000_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg';
 
     // ตรวจสอบว่ามีการส่งข้อมูลมาครบหรือไม่
     if (!name || !lastname || !phone || !password) {
@@ -94,10 +99,10 @@ router.post("/register", (req, res) => {
                 return res.status(409).json({ error: 'Phone number is already registered' });
             }
 
-            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name และ lastname)
+            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, address, img)
             conn.query(
-                "INSERT INTO users (name, lastname, phone, password) VALUES (?, ?, ?, ?)",
-                [name, lastname, phone, password],
+                "INSERT INTO users (name, lastname, phone, password, address, img) VALUES (?, ?, ?, ?, ?, ?)",
+                [name, lastname, phone, password, address, img],
                 (err, result) => {
                     if (err) {
                         console.log(err);
@@ -134,6 +139,7 @@ router.post("/register", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 // เส้นทางสำหรับการอัปเดตชื่อและนามสกุล
@@ -173,7 +179,7 @@ router.put("/update/:uid", (req, res) => {
 });
 
 // เส้นทางสำหรับการลบข้อมูลผู้ใช้ตาม uid
-router.delete("/users/:uid", (req, res) => {
+router.delete("/delete/:uid", (req, res) => {
     const { uid } = req.params; // รับค่า uid จากพารามิเตอร์
 
     try {
