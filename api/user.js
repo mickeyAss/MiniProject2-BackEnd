@@ -171,3 +171,28 @@ router.put("/update/:uid", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
+// เส้นทางสำหรับการลบข้อมูลผู้ใช้ตาม uid
+router.delete("/users/:uid", (req, res) => {
+    const { uid } = req.params; // รับค่า uid จากพารามิเตอร์
+
+    try {
+        // ลบข้อมูลผู้ใช้ตาม uid
+        conn.query("DELETE FROM users WHERE uid = ?", [uid], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Query error' });
+            }
+            // ตรวจสอบว่าพบผู้ใช้หรือไม่
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            // ส่งข้อความยืนยันการลบข้อมูล
+            res.status(200).json({ message: 'User deleted successfully' });
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
