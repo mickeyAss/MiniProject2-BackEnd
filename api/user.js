@@ -72,7 +72,6 @@ router.post("/login", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
 // เส้นทางสำหรับการสมัครสมาชิก
 router.post("/register", (req, res) => {
     const { name, lastname, phone, password } = req.body; // รับค่า name, lastname, phone และ password จาก body
@@ -105,16 +104,27 @@ router.post("/register", (req, res) => {
                         return res.status(500).json({ error: 'Insert user error' });
                     }
 
-                    // สร้าง JWT token
-                    const token = jwt.sign({ uid: result.insertId, phone: phone }, secret, {
-                        expiresIn: '1h', // ตั้งเวลาให้หมดอายุภายใน 1 ชั่วโมง
-                    });
+                    const insertedUserId = result.insertId;
 
-                    // ส่ง token และข้อความยืนยันการสมัครสมาชิกสำเร็จกลับไป
-                    res.status(201).json({
-                        message: 'User registered successfully',
-                        token,
-                        uid: result.insertId,
+                    // ดึงข้อมูลผู้ใช้ที่เพิ่งถูกเพิ่มจากฐานข้อมูล
+                    conn.query("SELECT * FROM users WHERE uid = ?", [insertedUserId], (err, userResult) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).json({ error: 'Query user error' });
+                        }
+
+                        // สร้าง JWT token
+                        const token = jwt.sign({ uid: insertedUserId, phone: phone }, secret, {
+                            expiresIn: '1h', // ตั้งเวลาให้หมดอายุภายใน 1 ชั่วโมง
+                        });
+
+                        // แสดงข้อมูลผู้ใช้ที่สมัครสมาชิกและส่ง token กลับไป
+                        console.log('Registered user:', userResult[0]); // แสดงข้อมูลผู้ใช้ใน log
+                        res.status(201).json({
+                            message: 'User registered successfully',
+                            token,
+                            user: userResult[0] // ส่งข้อมูลผู้ใช้กลับไปด้วย
+                        });
                     });
                 }
             );
