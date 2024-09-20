@@ -65,7 +65,7 @@ router.post("/login", (req, res) => {
             });
 
             // ส่ง token กลับไปให้ผู้ใช้
-            res.status(200).json({ token, message: 'Login successful' });
+            res.status(200).json({ token, message: 'Login successful',result });
         });
     } catch (err) {
         console.log(err);
