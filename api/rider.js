@@ -44,33 +44,18 @@ router.post("/login", (req, res) => {
             }
 
             const rider = result[0];
-            
-            // ตรวจสอบรหัสผ่าน
             if (password !== rider.password) {
                 return res.status(401).json({ error: 'Invalid phone or password' });
             }
 
-            // ตรวจสอบข้อมูลก่อนส่งกลับ
-            console.log("Rider:", rider);
-
-            // ส่งข้อมูลที่ถูกต้องกลับไป
-            res.status(200).json({
-                message: 'Login successful',
-                rider: {
-                    rid: rider.rid,
-                    name: rider.name,
-                    lastname: rider.lastname,
-                    phone: rider.phone,
-                    img: rider.img
-                }
-            });
+            // ลบการสร้างและส่ง token
+            res.status(200).json({ message: 'Login successful', rider });
         });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 router.post("/register", (req, res) => {
     const { name, lastname, phone, password } = req.body; // รับค่า name, lastname, phone และ password จาก body
