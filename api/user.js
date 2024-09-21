@@ -63,8 +63,7 @@ router.post("/login", (req, res) => {
 router.post("/register", (req, res) => {
     const { name, lastname, phone, password } = req.body; // รับค่า name, lastname, phone และ password จาก body
 
-    // กำหนดค่าเริ่มต้นสำหรับ address และ img
-    const address = 'ยังไม่เพิ่มที่อยู่';
+    // กำหนดค่าเริ่มต้นสำหรับ img
     const img = 'https://as1.ftcdn.net/v2/jpg/03/46/83/96/1000_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg';
 
     // ตรวจสอบว่ามีการส่งข้อมูลมาครบหรือไม่
@@ -85,10 +84,10 @@ router.post("/register", (req, res) => {
                 return res.status(409).json({ error: 'Phone number is already registered' });
             }
 
-            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, address, img)
+            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img)
             conn.query(
-                "INSERT INTO users (name, lastname, phone, password, address, img) VALUES (?, ?, ?, ?, ?, ?)",
-                [name, lastname, phone, password, address, img],
+                "INSERT INTO users (name, lastname, phone, password, img) VALUES (?, ?, ?, ?, ?)",
+                [name, lastname, phone, password, img],
                 (err, result) => {
                     if (err) {
                         console.log(err);
@@ -104,16 +103,10 @@ router.post("/register", (req, res) => {
                             return res.status(500).json({ error: 'Query user error' });
                         }
 
-                        // สร้าง JWT token
-                        const token = jwt.sign({ uid: insertedUserId, phone: phone }, secret, {
-                            expiresIn: '1h', // ตั้งเวลาให้หมดอายุภายใน 1 ชั่วโมง
-                        });
-
-                        // แสดงข้อมูลผู้ใช้ที่สมัครสมาชิกและส่ง token กลับไป
+                        // แสดงข้อมูลผู้ใช้ที่สมัครสมาชิกและส่งกลับไป
                         console.log('Registered user:', userResult[0]); // แสดงข้อมูลผู้ใช้ใน log
                         res.status(201).json({
                             message: 'User registered successfully',
-                            token,
                             user: userResult[0] // ส่งข้อมูลผู้ใช้กลับไปด้วย
                         });
                     });
@@ -125,6 +118,7 @@ router.post("/register", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 
