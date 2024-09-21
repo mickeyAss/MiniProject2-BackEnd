@@ -58,13 +58,15 @@ router.post("/login", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
 // เส้นทางสำหรับการสมัครสมาชิก
 router.post("/register", (req, res) => {
     const { name, lastname, phone, password } = req.body; // รับค่า name, lastname, phone และ password จาก body
 
-    // กำหนดค่าเริ่มต้นสำหรับ img
+    // กำหนดค่าเริ่มต้นสำหรับ img, address, latitude, และ longitude
     const img = 'https://as1.ftcdn.net/v2/jpg/03/46/83/96/1000_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg';
+    const address = 'ยังไม่เพิ่มที่อยู่';
+    const latitude = 'ยังไม่มีละติจูด';
+    const longitude = 'ยังไม่มีลองติจูด';
 
     // ตรวจสอบว่ามีการส่งข้อมูลมาครบหรือไม่
     if (!name || !lastname || !phone || !password) {
@@ -84,10 +86,10 @@ router.post("/register", (req, res) => {
                 return res.status(409).json({ error: 'Phone number is already registered' });
             }
 
-            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img)
+            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img, address, latitude, longitude)
             conn.query(
-                "INSERT INTO users (name, lastname, phone, password, img) VALUES (?, ?, ?, ?, ?)",
-                [name, lastname, phone, password, img],
+                "INSERT INTO users (name, lastname, phone, password, img, address, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                [name, lastname, phone, password, img, address, latitude, longitude],
                 (err, result) => {
                     if (err) {
                         console.log(err);
