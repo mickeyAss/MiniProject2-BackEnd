@@ -36,10 +36,11 @@ router.post("/login", (req, res) => {
     try {
         conn.query("SELECT * FROM users WHERE phone = ?", [phone], (err, result) => {
             if (err) {
-                console.error(err); // เปลี่ยน console.log เป็น console.error
+                console.error(err);
                 return res.status(500).json({ error: 'Database query error' });
             }
 
+            // ตรวจสอบว่าพบผู้ใช้หรือไม่
             if (result.length === 0) {
                 return res.status(404).json({ error: 'User not found' });
             }
@@ -49,8 +50,8 @@ router.post("/login", (req, res) => {
                 return res.status(401).json({ error: 'Invalid phone or password' });
             }
 
-            const token = jwt.sign({ uid: user.uid, phone: user.phone }, secret, { expiresIn: '1h' });
-            res.status(200).json({ token, message: 'Login successful', user });
+            // ลบการสร้างและส่ง token
+            res.status(200).json({ message: 'Login successful', user });
         });
     } catch (err) {
         console.error(err);
