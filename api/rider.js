@@ -23,6 +23,7 @@ router.get("/get/:rid", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 router.post("/login", (req, res) => {
     const { phone, password } = req.body;
 
