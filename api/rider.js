@@ -43,13 +43,13 @@ router.post("/login", (req, res) => {
                 return res.status(404).json({ error: 'User not found' });
             }
 
-            const user = result[0];
-            if (password !== user.password) {
+            const rider = result[0];
+            if (password !== rider.password) {
                 return res.status(401).json({ error: 'Invalid phone or password' });
             }
 
             // ลบการสร้างและส่ง token
-            res.status(200).json({ message: 'Login successful', user });
+            res.status(200).json({ message: 'Login successful', rider });
         });
     } catch (err) {
         console.error(err);
