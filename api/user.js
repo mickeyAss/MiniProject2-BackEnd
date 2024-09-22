@@ -58,6 +58,7 @@ router.post("/login", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 // เส้นทางสำหรับการสมัครสมาชิก
 router.post("/register", (req, res) => {
     const { name, lastname, phone, password } = req.body; // รับค่า name, lastname, phone และ password จาก body
@@ -127,18 +128,18 @@ router.post("/register", (req, res) => {
 // เส้นทางสำหรับการอัปเดตชื่อและนามสกุล
 router.put("/update/:uid", (req, res) => {
     const { uid } = req.params; // รับค่า uid จากพารามิเตอร์
-    const { name, lastname } = req.body; // รับค่า name และ lastname จาก body
+    const { latitude, longitude, address } = req.body; // รับค่า latitude, longitude และ address จาก body
 
     // ตรวจสอบว่ามีการส่งข้อมูลมาครบหรือไม่
-    if (!name || !lastname) {
-        return res.status(400).json({ error: 'Name and lastname are required' });
+    if (!latitude || !longitude || !address) {
+        return res.status(400).json({ error: 'Latitude, longitude, and address are required' });
     }
 
     try {
-        // อัปเดตชื่อและนามสกุลในฐานข้อมูล
+        // อัปเดต latitude, longitude และ address ในฐานข้อมูล
         conn.query(
-            "UPDATE users SET name = ?, lastname = ? WHERE uid = ?",
-            [name, lastname, uid],
+            "UPDATE users SET latitude = ?, longitude = ?, address = ? WHERE uid = ?",
+            [latitude, longitude, address, uid],
             (err, result) => {
                 if (err) {
                     console.log(err);
@@ -159,6 +160,7 @@ router.put("/update/:uid", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // เส้นทางสำหรับการลบข้อมูลผู้ใช้ตาม uid
 router.delete("/delete/:uid", (req, res) => {
@@ -184,3 +186,38 @@ router.delete("/delete/:uid", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
+router.get("/search-address", (req, res) => {
+    const { address } = req.query; // รับค่า address จาก query parameters
+
+    // ตรวจสอบว่ามีการส่งข้อมูล address มาหรือไม่
+    if (!address) {
+        return res.status(400).json({ error: 'Address is required' });
+    }
+
+    try {
+        // ค้นหาที่อยู่จากฐานข้อมูล
+        conn.query(
+            "SELECT * FROM users WHERE address LIKE ?",
+            [`%${address}%`], // ใช้ LIKE เพื่อค้นหาคำที่มีอยู่ใน address
+            (err, results) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({ error: 'Search query error' });
+                }
+
+                // ตรวจสอบว่าพบที่อยู่หรือไม่
+                if (results.length === 0) {
+                    return res.status(404).json({ error: 'Address not found' });
+                }
+
+                // ส่งข้อมูลที่ค้นพบกลับไป
+                res.status(200).json(results);
+            }
+        );
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
