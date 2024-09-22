@@ -26,6 +26,27 @@ router.get("/get/:uid", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
+router.get("/get/:uid1/:uid2", (req, res) => {
+    const { uid1, uid2 } = req.params; // รับค่า uid สองตัวจากพารามิเตอร์
+
+    try {
+        conn.query("SELECT * FROM users WHERE uid IN (?, ?)", [uid1, uid2], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'Users not found' });
+            }
+            res.status(200).json(result); // ส่งข้อมูลผู้ใช้ที่ตรงกับ uid ทั้งสองตัว
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
 router.post("/login", (req, res) => {
     const { phone, password } = req.body;
 
@@ -187,8 +208,8 @@ router.delete("/delete/:uid", (req, res) => {
     }
 });
 
-router.get("/search-address", (req, res) => {
-    const { address } = req.query; // รับค่า address จาก query parameters
+router.get("/search-address/:address", (req, res) => {
+    const { address } = req.params; // รับค่า address จากพารามิเตอร์
 
     // ตรวจสอบว่ามีการส่งข้อมูล address มาหรือไม่
     if (!address) {
@@ -220,4 +241,5 @@ router.get("/search-address", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
