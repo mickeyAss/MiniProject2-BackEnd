@@ -34,10 +34,10 @@ router.post('/add', (req, res) => {
     }
 
     try {
-        // Query สำหรับ insert ข้อมูลลงเทเบิ้ล product
-        const query = `INSERT INTO product (pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept) 
-                       VALUES (?, ?, ?, ?, ?)`;
-        const values = [pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept];
+        // Query สำหรับ insert ข้อมูลลงเทเบิ้ล product และเพิ่ม pro_status
+        const query = `INSERT INTO product (pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept, pro_status) 
+                       VALUES (?, ?, ?, ?, ?, ?)`;
+        const values = [pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept, 'รอไรเดอร์มารับ'];
 
         conn.query(query, values, (err, result) => {
             if (err) {
