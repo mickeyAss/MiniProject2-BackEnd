@@ -26,8 +26,8 @@ router.get("/get/:pid", (req, res) => {
 
 router.get("/get-all", (req, res) => {
     try {
-        // Query สำหรับดึงข้อมูลทั้งหมดจากตาราง product
-        conn.query("SELECT * FROM product", (err, result) => {
+        // Query สำหรับดึงข้อมูลทั้งหมดจากตาราง product ที่มี pro_status = 'รอไรเดอร์มารับ'
+        conn.query("SELECT * FROM product WHERE pro_status = ?", ['รอไรเดอร์มารับ'], (err, result) => {
             if (err) {
                 console.log(err);
                 return res.status(400).json({ error: 'Query error' });
@@ -45,6 +45,7 @@ router.get("/get-all", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 // Route สำหรับ insert ข้อมูล product
