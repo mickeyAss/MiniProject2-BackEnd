@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var conn = require('../dbconnect')
-var jwt = require('jsonwebtoken');
-var secret = 'Fullstack-Login-2024';
 
 
 module.exports = router;

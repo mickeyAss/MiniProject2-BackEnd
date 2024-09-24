@@ -1,0 +1,55 @@
+var express = require('express');
+var router = express.Router();
+var conn = require('../dbconnect')
+
+module.exports = router;
+
+router.get("/get/:pid", (req, res) => {
+    const { pid } = req.params; // รับค่า uid จากพารามิเตอร์
+
+    try {
+        conn.query("SELECT * FROM product WHERE pid = ?", [pid], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'Product not found' });
+            }
+            res.status(200).json(result[0]); 
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// Route สำหรับ insert ข้อมูล product
+router.post('/add', (req, res) => {
+    const { pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept } = req.body; // รับข้อมูลจาก body
+
+    // ตรวจสอบข้อมูลที่รับเข้ามา
+    if (!pro_name || !pro_detail || !pro_img || !uid_fk_send || !uid_fk_accept) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        // Query สำหรับ insert ข้อมูลลงเทเบิ้ล product
+        const query = `INSERT INTO product (pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept) 
+                       VALUES (?, ?, ?, ?, ?)`;
+        const values = [pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept];
+
+        conn.query(query, values, (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Insert query error' });
+            }
+
+            // ส่ง response กลับเมื่อทำการ insert สำเร็จ
+            res.status(201).json({ message: 'Product added successfully', productId: result.insertId });
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
