@@ -206,19 +206,19 @@ router.delete("/delete/:uid", (req, res) => {
     }
 });
 
-router.get("/search-address/:address", (req, res) => {
-    const { address } = req.params; // รับค่า address จากพารามิเตอร์
+router.get("/search-phone/:phone", (req, res) => {
+    const { phone } = req.params; // รับค่า address จากพารามิเตอร์
 
     // ตรวจสอบว่ามีการส่งข้อมูล address มาหรือไม่
-    if (!address) {
-        return res.status(400).json({ error: 'Address is required' });
+    if (!phone) {
+        return res.status(400).json({ error: 'Phone is required' });
     }
 
     try {
         // ค้นหาที่อยู่จากฐานข้อมูล
         conn.query(
-            "SELECT * FROM users WHERE address LIKE ?",
-            [`%${address}%`], // ใช้ LIKE เพื่อค้นหาคำที่มีอยู่ใน address
+            "SELECT * FROM users WHERE phone LIKE ?",
+            [`%${phone}%`], // ใช้ LIKE เพื่อค้นหาคำที่มีอยู่ใน address
             (err, results) => {
                 if (err) {
                     console.log(err);
