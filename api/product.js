@@ -58,10 +58,17 @@ router.post('/add', (req, res) => {
     }
 
     try {
-        // Query สำหรับ insert ข้อมูลลงเทเบิ้ล product และเพิ่ม pro_status
-        const query = `INSERT INTO product (pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept, pro_status) 
-                       VALUES (?, ?, ?, ?, ?, ?)`;
-        const values = [pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept, 'รอไรเดอร์มารับ'];
+        // สร้างเลขพัสดุแบบสุ่ม (เช่น 12 หลัก)
+        const generateTrackingNumber = () => {
+            return 'TRACK-' + Math.floor(100000000000 + Math.random() * 900000000000).toString();
+        };
+
+        const trackingNumber = generateTrackingNumber(); // สร้างเลขพัสดุ
+
+        // Query สำหรับ insert ข้อมูลลงเทเบิ้ล product และเพิ่ม pro_status และ tracking_number
+        const query = `INSERT INTO product (pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept, pro_status, tracking_number) 
+                       VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        const values = [pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept, 'รอไรเดอร์มารับ', trackingNumber];
 
         conn.query(query, values, (err, result) => {
             if (err) {
@@ -69,14 +76,19 @@ router.post('/add', (req, res) => {
                 return res.status(400).json({ error: 'Insert query error' });
             }
 
-            // ส่ง response กลับเมื่อทำการ insert สำเร็จ
-            res.status(201).json({ message: 'Product added successfully', productId: result.insertId });
+            // ส่ง response กลับเมื่อทำการ insert สำเร็จ พร้อมเลขพัสดุ
+            res.status(201).json({ 
+                message: 'Product added successfully', 
+                productId: result.insertId, 
+                trackingNumber: trackingNumber 
+            });
         });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // Route สำหรับลบข้อมูลทั้งหมดใน product
 router.delete('/delete-all', (req, res) => {
