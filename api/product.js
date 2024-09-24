@@ -24,6 +24,26 @@ router.get("/get/:pid", (req, res) => {
     }
 });
 
+router.get("/get-latest", (req, res) => {
+    try {
+        // Query เพื่อดึง pid ล่าสุด
+        conn.query("SELECT * FROM product ORDER BY pid DESC LIMIT 1", (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'No product found' });
+            }
+            res.status(200).json(result[0]); // ส่งข้อมูล product ที่ได้กลับมา
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 router.get("/get-all", (req, res) => {
     try {
         // Query สำหรับดึงข้อมูลทั้งหมดจากตาราง product ที่มี pro_status = 'รอไรเดอร์มารับ'
