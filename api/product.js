@@ -24,6 +24,29 @@ router.get("/get/:pid", (req, res) => {
     }
 });
 
+router.get("/get-all", (req, res) => {
+    try {
+        // Query สำหรับดึงข้อมูลทั้งหมดจากตาราง product
+        conn.query("SELECT * FROM product", (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'No products found' });
+            }
+
+            // ส่งข้อมูลทั้งหมดกลับ
+            res.status(200).json(result); 
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 // Route สำหรับ insert ข้อมูล product
 router.post('/add', (req, res) => {
     const { pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept } = req.body; // รับข้อมูลจาก body
