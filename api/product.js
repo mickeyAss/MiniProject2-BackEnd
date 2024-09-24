@@ -4,11 +4,18 @@ var conn = require('../dbconnect')
 
 module.exports = router;
 
-router.get("/get/:pid", (req, res) => {
-    const { pid } = req.params; // รับค่า uid จากพารามิเตอร์
+// รับ tracking_number
+router.get("/get/:tracking_number", (req, res) => {
+    const { tracking_number } = req.params; 
+
+    // ตรวจสอบว่า tracking_number มีค่าไหม
+    if (!tracking_number) {
+        return res.status(400).json({ error: 'Tracking number is required' });
+    }
 
     try {
-        conn.query("SELECT * FROM product WHERE pid = ?", [pid], (err, result) => {
+        // คิวรีข้อมูลจากฐานข้อมูล
+        conn.query("SELECT * FROM product WHERE tracking_number = ?", [tracking_number], (err, result) => {
             if (err) {
                 console.log(err);
                 return res.status(400).json({ error: 'Query error' });
@@ -16,6 +23,7 @@ router.get("/get/:pid", (req, res) => {
             if (result.length === 0) {
                 return res.status(404).json({ error: 'Product not found' });
             }
+            // ส่งผลลัพธ์กลับ
             res.status(200).json(result[0]); 
         });
     } catch (err) {
