@@ -53,3 +53,24 @@ router.post('/add', (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
+// Route สำหรับลบข้อมูลทั้งหมดใน product
+router.delete('/delete-all', (req, res) => {
+    try {
+        // Query สำหรับลบข้อมูลทั้งหมดในเทเบิ้ล product
+        const query = "DELETE FROM product";
+
+        conn.query(query, (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Delete query error' });
+            }
+
+            // ส่ง response กลับเมื่อทำการลบสำเร็จ
+            res.status(200).json({ message: 'All products deleted successfully' });
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
