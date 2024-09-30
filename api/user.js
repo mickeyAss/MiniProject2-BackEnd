@@ -80,15 +80,9 @@ router.post("/login", (req, res) => {
 
 // เส้นทางสำหรับการสมัครสมาชิก
 router.post("/register", (req, res) => {
-    const { name, lastname, phone, password } = req.body; // รับค่า name, lastname, phone และ password จาก body
+    const { name, lastname, phone, password, img, address, latitude, longitude } = req.body; // รับค่าทั้งหมดจาก body
 
-    // กำหนดค่าเริ่มต้นสำหรับ img, address, latitude, และ longitude
-    const img = 'https://as1.ftcdn.net/v2/jpg/03/46/83/96/1000_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg';
-    const address = 'ยังไม่เพิ่มที่อยู่';
-    const latitude = 'ยังไม่มีละติจูด';
-    const longitude = 'ยังไม่มีลองติจูด';
-
-    // ตรวจสอบว่ามีการส่งข้อมูลมาครบหรือไม่
+    // ตรวจสอบว่ามีการส่งข้อมูลสำคัญมาครบหรือไม่
     if (!name || !lastname || !phone || !password) {
         return res.status(400).json({ error: 'Name, lastname, phone, and password are required' });
     }
@@ -109,7 +103,7 @@ router.post("/register", (req, res) => {
             // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img, address, latitude, longitude)
             conn.query(
                 "INSERT INTO users (name, lastname, phone, password, img, address, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                [name, lastname, phone, password, img, address, latitude, longitude],
+                [name, lastname, phone, password, img || null, address || null, latitude || null, longitude || null],
                 (err, result) => {
                     if (err) {
                         console.log(err);
@@ -140,6 +134,7 @@ router.post("/register", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 
@@ -199,6 +194,29 @@ router.delete("/delete/:uid", (req, res) => {
 
             // ส่งข้อความยืนยันการลบข้อมูล
             res.status(200).json({ message: 'User deleted successfully' });
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+router.delete("/delete-all", (req, res) => {
+    try {
+        // ลบข้อมูลผู้ใช้ทั้งหมด
+        conn.query("DELETE FROM users", (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Query error' });
+            }
+
+            // ตรวจสอบว่ามีการลบข้อมูลหรือไม่
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'No users found to delete' });
+            }
+
+            // ส่งข้อความยืนยันการลบข้อมูลทั้งหมด
+            res.status(200).json({ message: 'All users deleted successfully' });
         });
     } catch (err) {
         console.log(err);
