@@ -87,19 +87,6 @@ router.post("/register", (req, res) => {
         return res.status(400).json({ error: 'Name, lastname, phone, and password are required' });
     }
 
-    // แปลงค่า latitude และ longitude เป็นตัวเลข (double)
-    const lat = latitude !== undefined ? parseFloat(latitude) : null;
-    const lon = longitude !== undefined ? parseFloat(longitude) : null;
-
-    // ตรวจสอบว่าค่า latitude และ longitude เป็นตัวเลขหรือไม่
-    if (lat === null || isNaN(lat)) {
-        return res.status(400).json({ error: 'Latitude must be a valid number' });
-    }
-
-    if (lon === null || isNaN(lon)) {
-        return res.status(400).json({ error: 'Longitude must be a valid number' });
-    }
-
     try {
         // ตรวจสอบว่าหมายเลขโทรศัพท์ซ้ำหรือไม่
         conn.query("SELECT * FROM users WHERE phone = ?", [phone], (err, result) => {
@@ -116,7 +103,7 @@ router.post("/register", (req, res) => {
             // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img, address, latitude, longitude)
             conn.query(
                 "INSERT INTO users (name, lastname, phone, password, img, address, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                [name, lastname, phone, password, img || null, address || null, lat, lon],
+                [name, lastname, phone, password, img || null, address || null, latitude || null, longitude || null],
                 (err, result) => {
                     if (err) {
                         console.log(err);
@@ -147,7 +134,6 @@ router.post("/register", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 
 
