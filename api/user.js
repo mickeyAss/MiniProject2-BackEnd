@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var conn = require('../dbconnect')
+const multer = require('multer');
 
 
 module.exports = router;
@@ -78,9 +79,23 @@ router.post("/login", (req, res) => {
     }
 });
 
-// เส้นทางสำหรับการสมัครสมาชิก
-router.post("/register", (req, res) => {
-    const { name, lastname, phone, password, img, address, latitude, longitude } = req.body; // รับค่าทั้งหมดจาก body
+// ตั้งค่าที่เก็บไฟล์
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/'); // กำหนดโฟลเดอร์ที่จะเก็บไฟล์
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname)); // ตั้งชื่อไฟล์ให้ไม่ซ้ำกัน
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// Endpoint สำหรับการลงทะเบียน
+router.post("/register", upload.single('img'), (req, res) => {
+    const { name, lastname, phone, password, address, latitude, longitude } = req.body; // รับค่าทั้งหมดจาก body
+    const img = req.file ? req.file.path : null; // ดึงที่อยู่ไฟล์รูปภาพ
 
     // ตรวจสอบว่ามีการส่งข้อมูลสำคัญมาครบหรือไม่
     if (!name || !lastname || !phone || !password) {
@@ -103,7 +118,7 @@ router.post("/register", (req, res) => {
             // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img, address, latitude, longitude)
             conn.query(
                 "INSERT INTO users (name, lastname, phone, password, img, address, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                [name, lastname, phone, password, img || null, address || null, latitude || null, longitude || null],
+                [name, lastname, phone, password, img, address || null, latitude || null, longitude || null],
                 (err, result) => {
                     if (err) {
                         console.log(err);
