@@ -78,20 +78,13 @@ router.post("/login", (req, res) => {
     }
 });
 
-// Endpoint สำหรับการลงทะเบียน
+// เส้นทางสำหรับการสมัครสมาชิก
 router.post("/register", (req, res) => {
-    const { name, lastname, phone, password, imgBase64, address, latitude, longitude } = req.body; // รับค่าจาก body
+    const { name, lastname, phone, password, img, address, latitude, longitude } = req.body; // รับค่าทั้งหมดจาก body
 
     // ตรวจสอบว่ามีการส่งข้อมูลสำคัญมาครบหรือไม่
     if (!name || !lastname || !phone || !password) {
         return res.status(400).json({ error: 'Name, lastname, phone, and password are required' });
-    }
-
-    // ถ้ามีการส่ง Base64 ของภาพมา
-    let img = null;
-    if (imgBase64) {
-        // แปลง Base64 เป็น URL
-        img = `data:image/jpeg;base64,${imgBase64}`; // เปลี่ยน image/jpeg เป็นประเภทไฟล์ที่ถูกต้องถ้าต้องการ
     }
 
     try {
@@ -110,7 +103,7 @@ router.post("/register", (req, res) => {
             // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img, address, latitude, longitude)
             conn.query(
                 "INSERT INTO users (name, lastname, phone, password, img, address, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                [name, lastname, phone, password, img, address || null, latitude || null, longitude || null],
+                [name, lastname, phone, password, img || null, address || null, latitude || null, longitude || null],
                 (err, result) => {
                     if (err) {
                         console.log(err);
@@ -141,6 +134,10 @@ router.post("/register", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
+
+
+
 
 // เส้นทางสำหรับการอัปเดตชื่อและนามสกุล
 router.put("/update/:uid", (req, res) => {
