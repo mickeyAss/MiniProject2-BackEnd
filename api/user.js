@@ -79,26 +79,12 @@ router.post("/login", (req, res) => {
 });
 
 // เส้นทางสำหรับการสมัครสมาชิก
-
-router.post("/register", async (req, res) => {
-    const { name, lastname, phone, password, img, address, latitude, longitude } = req.body;
+router.post("/register", (req, res) => {
+    const { name, lastname, phone, password, img, address, latitude, longitude } = req.body; // รับค่าทั้งหมดจาก body
 
     // ตรวจสอบว่ามีการส่งข้อมูลสำคัญมาครบหรือไม่
     if (!name || !lastname || !phone || !password) {
         return res.status(400).json({ error: 'Name, lastname, phone, and password are required' });
-    }
-
-    // แปลงค่า latitude และ longitude เป็นตัวเลข (double)
-    const lat = latitude ? parseFloat(latitude) : null;
-    const lon = longitude ? parseFloat(longitude) : null;
-
-    // ตรวจสอบว่าค่า latitude และ longitude เป็นตัวเลขหรือไม่
-    if (lat === null || isNaN(lat)) {
-        return res.status(400).json({ error: 'Latitude must be a valid number' });
-    }
-
-    if (lon === null || isNaN(lon)) {
-        return res.status(400).json({ error: 'Longitude must be a valid number' });
     }
 
     try {
@@ -114,42 +100,34 @@ router.post("/register", async (req, res) => {
                 return res.status(409).json({ error: 'Phone number is already registered' });
             }
 
-            // เข้ารหัสรหัสผ่าน
-            bcrypt.hash(password, 10, (err, hash) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json({ error: 'Hashing password error' });
-                }
+            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img, address, latitude, longitude)
+            conn.query(
+                "INSERT INTO users (name, lastname, phone, password, img, address, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                [name, lastname, phone, password, img || null, address || null, latitude || null, longitude || null],
+                (err, result) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({ error: 'Insert user error' });
+                    }
 
-                // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, img, address, latitude, longitude)
-                conn.query(
-                    "INSERT INTO users (name, lastname, phone, password, img, address, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    [name, lastname, phone, hash, img || null, address || null, lat, lon],
-                    (err, result) => {
+                    const insertedUserId = result.insertId;
+
+                    // ดึงข้อมูลผู้ใช้ที่เพิ่งถูกเพิ่มจากฐานข้อมูล
+                    conn.query("SELECT * FROM users WHERE uid = ?", [insertedUserId], (err, userResult) => {
                         if (err) {
                             console.log(err);
-                            return res.status(500).json({ error: 'Insert user error' });
+                            return res.status(500).json({ error: 'Query user error' });
                         }
 
-                        const insertedUserId = result.insertId;
-
-                        // ดึงข้อมูลผู้ใช้ที่เพิ่งถูกเพิ่มจากฐานข้อมูล
-                        conn.query("SELECT * FROM users WHERE uid = ?", [insertedUserId], (err, userResult) => {
-                            if (err) {
-                                console.log(err);
-                                return res.status(500).json({ error: 'Query user error' });
-                            }
-
-                            // แสดงข้อมูลผู้ใช้ที่สมัครสมาชิกและส่งกลับไป
-                            console.log('Registered user:', userResult[0]); // แสดงข้อมูลผู้ใช้ใน log
-                            res.status(201).json({
-                                message: 'User registered successfully',
-                                user: userResult[0] // ส่งข้อมูลผู้ใช้กลับไปด้วย
-                            });
+                        // แสดงข้อมูลผู้ใช้ที่สมัครสมาชิกและส่งกลับไป
+                        console.log('Registered user:', userResult[0]); // แสดงข้อมูลผู้ใช้ใน log
+                        res.status(201).json({
+                            message: 'User registered successfully',
+                            user: userResult[0] // ส่งข้อมูลผู้ใช้กลับไปด้วย
                         });
-                    }
-                );
-            });
+                    });
+                }
+            );
         });
     } catch (err) {
         console.log(err);
