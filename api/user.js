@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var conn = require('../dbconnect')
-const multer = require('multer');
 
 
 module.exports = router;
@@ -79,27 +78,20 @@ router.post("/login", (req, res) => {
     }
 });
 
-// ตั้งค่าที่เก็บไฟล์
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/'); // กำหนดโฟลเดอร์ที่จะเก็บไฟล์
-    },
-    filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname)); // ตั้งชื่อไฟล์ให้ไม่ซ้ำกัน
-    }
-});
-
-const upload = multer({ storage: storage });
-
 // Endpoint สำหรับการลงทะเบียน
-router.post("/register", upload.single('img'), (req, res) => {
-    const { name, lastname, phone, password, address, latitude, longitude } = req.body; // รับค่าทั้งหมดจาก body
-    const img = req.file ? req.file.path : null; // ดึงที่อยู่ไฟล์รูปภาพ
+router.post("/register", (req, res) => {
+    const { name, lastname, phone, password, imgBase64, address, latitude, longitude } = req.body; // รับค่าจาก body
 
     // ตรวจสอบว่ามีการส่งข้อมูลสำคัญมาครบหรือไม่
     if (!name || !lastname || !phone || !password) {
         return res.status(400).json({ error: 'Name, lastname, phone, and password are required' });
+    }
+
+    // ถ้ามีการส่ง Base64 ของภาพมา
+    let img = null;
+    if (imgBase64) {
+        // แปลง Base64 เป็น URL
+        img = `data:image/jpeg;base64,${imgBase64}`; // เปลี่ยน image/jpeg เป็นประเภทไฟล์ที่ถูกต้องถ้าต้องการ
     }
 
     try {
@@ -149,10 +141,6 @@ router.post("/register", upload.single('img'), (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
-
-
-
 
 // เส้นทางสำหรับการอัปเดตชื่อและนามสกุล
 router.put("/update/:uid", (req, res) => {
