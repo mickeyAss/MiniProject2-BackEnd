@@ -58,12 +58,11 @@ router.post("/login", (req, res) => {
 });
 
 router.post("/register", (req, res) => {
-    const { name, lastname, phone, password } = req.body; // รับค่า name, lastname, phone และ password จาก body
-    const img = 'https://as1.ftcdn.net/v2/jpg/03/46/83/96/1000_F_346839683_6nAPzbhpSkIpb8pmAwufkC7c5eD7wYws.jpg';
+    const { name, lastname, phone, password, img } = req.body; // รับค่า img จาก body ด้วย
 
     // ตรวจสอบว่ามีการส่งข้อมูลมาครบหรือไม่
-    if (!name || !lastname || !phone || !password) {
-        return res.status(400).json({ error: 'Name, lastname, phone, and password are required' });
+    if (!name || !lastname || !phone || !password || !img) {
+        return res.status(400).json({ error: 'Name, lastname, phone, password, and img are required' });
     }
 
     try {
@@ -107,6 +106,30 @@ router.post("/register", (req, res) => {
                     });
                 }
             );
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+router.delete("/delete-all", (req, res) => {
+    try {
+        // ลบข้อมูลผู้ใช้ทั้งหมด
+        conn.query("DELETE FROM rider", (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ error: 'Query error' });
+            }
+
+            // ตรวจสอบว่ามีการลบข้อมูลหรือไม่
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'No rider found to delete' });
+            }
+
+            // ส่งข้อความยืนยันการลบข้อมูลทั้งหมด
+            res.status(200).json({ message: 'All rider deleted successfully' });
         });
     } catch (err) {
         console.log(err);
