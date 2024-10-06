@@ -58,11 +58,11 @@ router.post("/login", (req, res) => {
 });
 
 router.post("/register", (req, res) => {
-    const { name, lastname, phone, password, img } = req.body; // รับค่า img จาก body ด้วย
+    const { name, lastname, phone, password, img, car_registration } = req.body; // เพิ่มการรับค่า car_registration
 
     // ตรวจสอบว่ามีการส่งข้อมูลมาครบหรือไม่
-    if (!name || !lastname || !phone || !password || !img) {
-        return res.status(400).json({ error: 'Name, lastname, phone, password, and img are required' });
+    if (!name || !lastname || !phone || !password || !img || !car_registration) {
+        return res.status(400).json({ error: 'Name, lastname, phone, password, img, and car_registration are required' });
     }
 
     try {
@@ -78,10 +78,10 @@ router.post("/register", (req, res) => {
                 return res.status(409).json({ error: 'Phone number is already registered' });
             }
 
-            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, address, img)
+            // แทรกข้อมูลผู้ใช้ใหม่ลงในฐานข้อมูล (รวม name, lastname, address, img, car_registration)
             conn.query(
-                "INSERT INTO rider (name, lastname, phone, password, img) VALUES (?, ?, ?, ?, ?)",
-                [name, lastname, phone, password, img],
+                "INSERT INTO rider (name, lastname, phone, password, img, car_registration) VALUES (?, ?, ?, ?, ?, ?)",
+                [name, lastname, phone, password, img, car_registration],
                 (err, result) => {
                     if (err) {
                         console.log(err);
@@ -112,6 +112,7 @@ router.post("/register", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 router.delete("/delete-all", (req, res) => {
