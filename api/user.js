@@ -29,7 +29,17 @@ router.get("/get/:uid1/:uid2", (req, res) => {
     const { uid1, uid2 } = req.params; // รับค่า uid สองตัวจากพารามิเตอร์
 
     try {
-        conn.query("SELECT * FROM users WHERE uid IN (?, ?)", [uid1, uid2], (err, result) => {
+        conn.query(`
+            SELECT 
+                u1.uid AS sender_uid, u1.name AS sender_name, u1.lastname AS sender_lastname, 
+                u1.phone AS sender_phone, u1.address AS sender_address, u1.latitude AS sender_latitude, 
+                u1.longitude AS sender_longitude, u1.img AS sender_img,
+                u2.uid AS receiver_uid, u2.name AS receiver_name, u2.lastname AS receiver_lastname, 
+                u2.phone AS receiver_phone, u2.address AS receiver_address, u2.latitude AS receiver_latitude, 
+                u2.longitude AS receiver_longitude, u2.img AS receiver_img
+            FROM users u1
+            JOIN users u2 ON u1.uid = ? AND u2.uid = ?
+        `, [uid1, uid2], (err, result) => {
             if (err) {
                 console.log(err);
                 return res.status(400).json({ error: 'Query error' });
@@ -37,13 +47,17 @@ router.get("/get/:uid1/:uid2", (req, res) => {
             if (result.length === 0) {
                 return res.status(404).json({ error: 'Users not found' });
             }
-            res.status(200).json(result); // ส่งข้อมูลผู้ใช้ที่ตรงกับ uid ทั้งสองตัว
+
+            // ส่งข้อมูลผู้ส่งและผู้รับกลับไป
+            res.status(200).json(result[0]); // ส่งแค่แถวแรกเพราะผลลัพธ์มาจากการ JOIN
         });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
+
 
 router.post("/login", (req, res) => {
     const { phone, password } = req.body;
