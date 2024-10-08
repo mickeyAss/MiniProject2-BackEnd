@@ -14,8 +14,23 @@ router.get("/get/:tracking_number", (req, res) => {
     }
 
     try {
-        // คิวรีข้อมูลจากฐานข้อมูล
-        conn.query("SELECT * FROM product WHERE tracking_number = ?", [tracking_number], (err, result) => {
+        // คิวรีข้อมูลจากฐานข้อมูล พร้อมเชื่อมกับข้อมูลของผู้ส่ง (uid_fk_send) และผู้รับ (uid_fk_accept)
+        const query = `
+            SELECT p.pid, p.pro_name, p.pro_detail, p.pro_img, p.pro_status, p.tracking_number, 
+                   p.uid_fk_send, p.uid_fk_accept, p.rid_fk,
+                   u_send.uid AS sender_uid, u_send.name AS sender_name, u_send.lastname AS sender_lastname, 
+                   u_send.phone AS sender_phone, u_send.address AS sender_address, 
+                   u_send.latitude AS sender_latitude, u_send.longitude AS sender_longitude, u_send.img AS sender_img,
+                   u_accept.uid AS receiver_uid, u_accept.name AS receiver_name, u_accept.lastname AS receiver_lastname, 
+                   u_accept.phone AS receiver_phone, u_accept.address AS receiver_address, 
+                   u_accept.latitude AS receiver_latitude, u_accept.longitude AS receiver_longitude, u_accept.img AS receiver_img
+            FROM product p
+            LEFT JOIN users u_send ON p.uid_fk_send = u_send.uid
+            LEFT JOIN users u_accept ON p.uid_fk_accept = u_accept.uid
+            WHERE p.tracking_number = ?
+        `;
+
+        conn.query(query, [tracking_number], (err, result) => {
             if (err) {
                 console.log(err);
                 return res.status(400).json({ error: 'Query error' });
@@ -31,6 +46,7 @@ router.get("/get/:tracking_number", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 router.get("/get-latest", (req, res) => {
     try {
