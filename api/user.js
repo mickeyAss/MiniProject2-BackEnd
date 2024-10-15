@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var conn = require('../dbconnect')
 
-
 module.exports = router;
 
 router.get("/get/:uid", (req, res) => {
@@ -56,7 +55,6 @@ router.get("/get/:uid1/:uid2", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 
 router.post("/login", (req, res) => {
@@ -149,10 +147,6 @@ router.post("/register", (req, res) => {
     }
 });
 
-
-
-
-
 // เส้นทางสำหรับการอัปเดตชื่อและนามสกุล
 router.put("/update/:uid", (req, res) => {
     const { uid } = req.params; // รับค่า uid จากพารามิเตอร์
@@ -188,7 +182,6 @@ router.put("/update/:uid", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 // เส้นทางสำหรับการลบข้อมูลผู้ใช้ตาม uid
 router.delete("/delete/:uid", (req, res) => {
