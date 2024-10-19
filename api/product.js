@@ -240,23 +240,23 @@ router.post('/add-status', (req, res) => {
 });
 
 
-router.get("/get-status/:uid_send/:uid_accept", (req, res) => {
+router.get("/get-status/:tacking", (req, res) => {
     try {
-        const { uid_send, uid_accept } = req.params;
+        const { tacking } = req.params;
 
-        // ตรวจสอบว่ามี uid_send และ uid_accept หรือไม่
-        if (!uid_send || !uid_accept) {
-            return res.status(400).json({ error: 'uid_send and uid_accept are required' });
+        // ตรวจสอบว่ามี tracking_number หรือไม่
+        if (!tacking) {
+            return res.status(400).json({ error: 'Tracking number is required' });
         }
 
-        // Query สำหรับดึงข้อมูลจากตาราง status โดยใช้ uid_send และ uid_accept
+        // Query สำหรับดึงข้อมูลจากตาราง status โดยใช้ tracking_number
         const query = `
             SELECT * 
             FROM status 
-            WHERE uid_send = ? AND uid_accept = ?
+            WHERE tacking = ?
         `;
         
-        conn.query(query, [uid_send, uid_accept], (err, result) => {
+        conn.query(query, [tacking], (err, result) => {
             if (err) {
                 console.log(err);
                 return res.status(400).json({ error: 'Query error' });
@@ -264,7 +264,7 @@ router.get("/get-status/:uid_send/:uid_accept", (req, res) => {
 
             // ตรวจสอบว่ามีข้อมูลหรือไม่
             if (result.length === 0) {
-                return res.status(404).json({ message: 'ไม่มีข้อมูลสำหรับ uid_send และ uid_accept ที่กำหนด' });
+                return res.status(404).json({ message: 'No data found for the provided tracking number' });
             }
 
             // ส่งข้อมูลทั้งหมดกลับ
@@ -275,6 +275,7 @@ router.get("/get-status/:uid_send/:uid_accept", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // Route สำหรับลบข้อมูลทั้งหมดใน status
 router.delete('/delete-all-status', (req, res) => {
