@@ -275,6 +275,28 @@ router.get("/get-status/:uid_send/:uid_accept", (req, res) => {
     }
 });
 
+// Route สำหรับลบข้อมูลทั้งหมดใน status
+router.delete('/delete-all-status', (req, res) => {
+    try {
+        // Query สำหรับลบข้อมูลทั้งหมดในเทเบิ้ล status
+        const query = "DELETE FROM status";
+
+        conn.query(query, (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Delete query error' });
+            }
+
+            // ส่ง response กลับเมื่อทำการลบสำเร็จ
+            res.status(200).json({ message: 'All statuses deleted successfully' });
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 
 
 
