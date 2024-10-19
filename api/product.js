@@ -170,3 +170,36 @@ router.delete('/delete-all', (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
+// Route สำหรับเพิ่มข้อมูล status
+router.post('/add-status', (req, res) => {
+    const { uid_send, uid_accept, staname } = req.body; // รับข้อมูลจาก body
+
+    // ตรวจสอบข้อมูลที่รับเข้ามา
+    if (!uid_send || !uid_accept || !staname) {
+        return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    try {
+        // Query สำหรับ insert ข้อมูลลงในตาราง status
+        const query = `INSERT INTO status (uid_send, uid_accept, staname) 
+                       VALUES (?, ?, ?)`;
+        const values = [uid_send, uid_accept, staname];
+
+        conn.query(query, values, (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Insert query error' });
+            }
+
+            // ส่ง response กลับเมื่อทำการ insert สำเร็จ
+            res.status(201).json({ 
+                message: 'Status added successfully', 
+                statusId: result.insertId 
+            });
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
