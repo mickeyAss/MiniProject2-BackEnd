@@ -208,18 +208,18 @@ router.delete('/delete-all', (req, res) => {
 
 // Route สำหรับเพิ่มข้อมูล status
 router.post('/add-status', (req, res) => {
-    const { uid_send, uid_accept, staname } = req.body; // รับข้อมูลจาก body
+    const { uid_send, uid_accept, staname, tacking } = req.body; // รับข้อมูล trackingNumber ด้วย
 
     // ตรวจสอบข้อมูลที่รับเข้ามา
-    if (!uid_send || !uid_accept || !staname) {
+    if (!uid_send || !uid_accept || !staname || !tacking) {
         return res.status(400).json({ error: 'Missing required fields' });
     }
 
     try {
-        // Query สำหรับ insert ข้อมูลลงในตาราง status
-        const query = `INSERT INTO status (uid_send, uid_accept, staname) 
-                       VALUES (?, ?, ?)`;
-        const values = [uid_send, uid_accept, staname];
+        // Query สำหรับ insert ข้อมูลลงในตาราง status พร้อมกับ trackingNumber
+        const query = `INSERT INTO status (uid_send, uid_accept, staname, tacking) 
+                       VALUES (?, ?, ?, ?)`;
+        const values = [uid_send, uid_accept, staname, tacking];
 
         conn.query(query, values, (err, result) => {
             if (err) {
@@ -238,6 +238,7 @@ router.post('/add-status', (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 router.get("/get-status/:uid_send/:uid_accept", (req, res) => {
     try {
