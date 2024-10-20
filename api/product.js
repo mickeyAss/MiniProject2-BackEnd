@@ -9,8 +9,8 @@ const query = util.promisify(conn.query).bind(conn);
 module.exports = router;
 
 // รับ tracking_number
-router.get("/get/:tracking_number", async (req, res) => {
-    const { tracking_number } = req.params;
+router.get("/get/:tracking_number", (req, res) => {
+    const { tracking_number } = req.params; 
 
     // ตรวจสอบว่า tracking_number มีค่าไหม
     if (!tracking_number) {
@@ -34,31 +34,25 @@ router.get("/get/:tracking_number", async (req, res) => {
             WHERE p.tracking_number = ?
         `;
 
-        // ใช้ Promise กับ conn.query
-        const [result] = await new Promise((resolve, reject) => {
-            conn.query(query, [tracking_number], (err, result) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(result);
-            });
+        conn.query(query, [tracking_number], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'Product not found' });
+            }
+            // ส่งผลลัพธ์กลับ
+            res.status(200).json(result[0]); 
         });
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Product not found' });
-        }
-
-        // ส่งผลลัพธ์กลับ
-        res.status(200).json(result[0]);
     } catch (err) {
         console.log(err);
-        res.status(500).json({ error: 'Server error' });
+        return res.status(500).json({ error: 'Server error' });
     }
 });
 
 
-
-router.get("/get-latest", async (req, res) => {
+router.get("/get-latest", (req, res) => {
     try {
         // Query เพื่อดึงข้อมูล product และข้อมูลของผู้ส่ง (uid_fk_send) และผู้รับ (uid_fk_accept)
         const query = `
@@ -75,32 +69,23 @@ router.get("/get-latest", async (req, res) => {
             LEFT JOIN users u_accept ON p.uid_fk_accept = u_accept.uid
             ORDER BY p.pid DESC LIMIT 1
         `;
-
-        // ใช้ Promise กับ conn.query
-        const [result] = await new Promise((resolve, reject) => {
-            conn.query(query, (err, result) => {
-                if (err) {
-                    return reject(err);
-                }
-                resolve(result);
-            });
+        conn.query(query, (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'No product found' });
+            }
+            res.status(200).json(result[0]); // ส่งข้อมูล product พร้อมข้อมูลของผู้ส่งและผู้รับ
         });
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'No product found' });
-        }
-
-        // ส่งข้อมูล product พร้อมข้อมูลของผู้ส่งและผู้รับ
-        res.status(200).json(result[0]);
-
     } catch (err) {
         console.log(err);
-        res.status(500).json({ error: 'Server error' });
+        return res.status(500).json({ error: 'Server error' });
     }
 });
 
-
-router.get("/get-latest/:pid", async (req, res) => {
+router.get("/get-latest/:pid", (req, res) => {
     const { pid } = req.params;  // ดึง pid จากพารามิเตอร์ URL
     try {
         // Query เพื่อดึงข้อมูล product และข้อมูลของผู้ส่ง (uid_fk_send) และผู้รับ (uid_fk_accept)
@@ -118,61 +103,52 @@ router.get("/get-latest/:pid", async (req, res) => {
             LEFT JOIN users u_accept ON p.uid_fk_accept = u_accept.uid
             WHERE p.pid = ?  -- ใช้ pid ที่รับมาใน query
         `;
-
-        // ใช้ Promise กับ conn.query
-        const [result] = await new Promise((resolve, reject) => {
-            conn.query(query, [pid], (err, result) => {
-                if (err) {
-                    return reject(err);  // ในกรณีที่มีข้อผิดพลาด
-                }
-                resolve(result);  // คืนผลลัพธ์เมื่อสำเร็จ
-            });
+        conn.query(query, [pid], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'No product found with the provided pid' });
+            }
+            res.status(200).json(result[0]); // ส่งข้อมูล product พร้อมข้อมูลของผู้ส่งและผู้รับ
         });
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'No product found with the provided pid' });
-        }
-
-        // ส่งข้อมูล product พร้อมข้อมูลของผู้ส่งและผู้รับ
-        res.status(200).json(result[0]);
-
     } catch (err) {
         console.log(err);
-        res.status(500).json({ error: 'Server error' });
+        return res.status(500).json({ error: 'Server error' });
     }
 });
 
-router.get("/get-all", async (req, res) => {
+
+
+
+
+router.get("/get-all", (req, res) => {
     try {
         // Query สำหรับดึงข้อมูลทั้งหมดจากตาราง product ที่มี pro_status = 'รอไรเดอร์มารับ'
-        const query = "SELECT * FROM product WHERE pro_status = ?";
-        const status = 'รอไรเดอร์มารับ';
+        conn.query("SELECT * FROM product WHERE pro_status = ?", ['รอไรเดอร์มารับ'], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
 
-        // ใช้ Promise กับ conn.query
-        const result = await new Promise((resolve, reject) => {
-            conn.query(query, [status], (err, result) => {
-                if (err) {
-                    return reject(err);  // ในกรณีที่มีข้อผิดพลาด
-                }
-                resolve(result);  // คืนผลลัพธ์เมื่อสำเร็จ
-            });
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'No products found' });
+            }
+
+            // ส่งข้อมูลทั้งหมดกลับ
+            res.status(200).json(result); 
         });
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'No products found' });
-        }
-
-        // ส่งข้อมูลทั้งหมดกลับ
-        res.status(200).json(result);
-
     } catch (err) {
         console.log(err);
-        res.status(500).json({ error: 'Server error' });
+        return res.status(500).json({ error: 'Server error' });
     }
 });
 
+
+
 // Route สำหรับ insert ข้อมูล product
-router.post('/add', async (req, res) => {
+router.post('/add', (req, res) => {
     const { pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept } = req.body; // รับข้อมูลจาก body
 
     // ตรวจสอบข้อมูลที่รับเข้ามา
@@ -193,29 +169,24 @@ router.post('/add', async (req, res) => {
                        VALUES (?, ?, ?, ?, ?, ?, ?)`;
         const values = [pro_name, pro_detail, pro_img, uid_fk_send, uid_fk_accept, 'รอไรเดอร์มารับ', trackingNumber];
 
-        // ใช้ Promise กับ conn.query
-        const result = await new Promise((resolve, reject) => {
-            conn.query(query, values, (err, result) => {
-                if (err) {
-                    return reject(err);  // ในกรณีที่เกิดข้อผิดพลาด
-                }
-                resolve(result);  // คืนค่าเมื่อ insert สำเร็จ
+        conn.query(query, values, (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Insert query error' });
+            }
+
+            // ส่ง response กลับเมื่อทำการ insert สำเร็จ พร้อมเลขพัสดุ
+            res.status(201).json({ 
+                message: 'Product added successfully', 
+                productId: result.insertId, 
+                trackingNumber: trackingNumber 
             });
         });
-
-        // ส่ง response กลับเมื่อทำการ insert สำเร็จ พร้อมเลขพัสดุ
-        res.status(201).json({ 
-            message: 'Product added successfully', 
-            productId: result.insertId, 
-            trackingNumber: trackingNumber 
-        });
-
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 
 // Route สำหรับลบข้อมูลทั้งหมดใน product
@@ -269,7 +240,7 @@ router.post('/add-status', async (req, res) => {
 });
 
 
-router.get("/get-status/:tacking", async (req, res) => {
+router.get("/get-status/:tacking", (req, res) => {
     try {
         const { tacking } = req.params;
 
@@ -285,29 +256,26 @@ router.get("/get-status/:tacking", async (req, res) => {
             WHERE tacking = ?
         `;
         
-        // ใช้ Promise กับ conn.query
-        const result = await new Promise((resolve, reject) => {
-            conn.query(query, [tacking], (err, result) => {
-                if (err) {
-                    return reject(err);  // ในกรณีที่เกิดข้อผิดพลาด
-                }
-                resolve(result);  // คืนค่าเมื่อ query สำเร็จ
-            });
+        conn.query(query, [tacking], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+
+            // ตรวจสอบว่ามีข้อมูลหรือไม่
+            if (result.length === 0) {
+                return res.status(404).json({ message: 'No data found for the provided tracking number' });
+            }
+
+            // ส่งข้อมูลทั้งหมดกลับ
+            res.status(200).json(result);
         });
-
-        // ตรวจสอบว่ามีข้อมูลหรือไม่
-        if (result.length === 0) {
-            return res.status(404).json({ message: 'No data found for the provided tracking number' });
-        }
-
-        // ส่งข้อมูลทั้งหมดกลับ
-        res.status(200).json(result);
-        
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 // Route สำหรับลบข้อมูลทั้งหมดใน status
 router.delete('/delete-all-status', (req, res) => {
@@ -345,13 +313,13 @@ router.put('/update-status/:pid', async (req, res) => {
         // Query สำหรับอัพเดทคอลัมน์ pro_status โดยใช้ pid ที่รับมา
         const query = `UPDATE product SET pro_status = ? WHERE pid = ?`;
 
-        // ใช้ Promise กับ conn.query
-        const result = await new Promise((resolve, reject) => {
+        // ใช้ Promise เพื่อลงทะเบียนการดำเนินการ SQL
+        const [result] = await new Promise((resolve, reject) => {
             conn.query(query, [pro_status, pid], (err, result) => {
                 if (err) {
-                    return reject(err);  // ในกรณีที่เกิดข้อผิดพลาด
+                    return reject(err);
                 }
-                resolve(result);  // คืนค่าเมื่อ query สำเร็จ
+                resolve(result);
             });
         });
 
@@ -362,7 +330,6 @@ router.put('/update-status/:pid', async (req, res) => {
 
         // ส่ง response กลับเมื่อทำการอัพเดทสำเร็จ
         res.status(200).json({ message: 'Product status updated successfully' });
-        
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: 'Server error' });
