@@ -34,6 +34,8 @@ class _FinalRiderPageState extends State<FinalRiderPage> {
       'จัดส่งพัสดุสำเร็จ'; // ตัวแปรเก็บข้อความสถานะการจัดส่ง
 
   Map<String, dynamic>? documentData; // ตัวแปรเก็บข้อมูลเอกสาร
+
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -297,20 +299,24 @@ class _FinalRiderPageState extends State<FinalRiderPage> {
                 ],
               ),
               padding: const EdgeInsets.all(16),
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 72, 0, 0),
-                  foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                onPressed: updateProStatus,
-                child: const Text(
-                  'จัดส่งพัสดุสำเร็จ',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-              ),
+              child: isLoading
+                  ? CircularProgressIndicator() // แสดงการโหลด
+                  : FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 72, 0, 0),
+                        foregroundColor:
+                            const Color.fromARGB(255, 255, 255, 255),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: updateProStatus,
+                      child: const Text(
+                        'จัดส่งพัสดุสำเร็จ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
             ),
           ),
         ],
@@ -358,6 +364,20 @@ class _FinalRiderPageState extends State<FinalRiderPage> {
 
 // ฟังก์ชันสำหรับอัปเดตสถานะ
   Future<void> updateProStatus() async {
+    if (imagePath == null) {
+      // ถ้ายังไม่มีการถ่ายรูป แสดงข้อความแจ้งเตือน
+      Get.snackbar(
+        'แจ้งเตือน',
+        'กรุณาถ่ายรูปภาพก่อนดำเนินการ',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return; // หยุดการทำงาน
+    }
+    setState(() {
+      isLoading = true; // เริ่มการโหลด
+    });
     CollectionReference inboxCollection =
         FirebaseFirestore.instance.collection('inbox');
 
@@ -427,6 +447,9 @@ class _FinalRiderPageState extends State<FinalRiderPage> {
 
     if (updateStatus.statusCode == 200) {
       log('Status successfully updated to API');
+      setState(() {
+        isLoading = false; // หยุดการโหลด
+      });
       Get.to(
         () => HomeRiderPage(
           rid: widget.rid,

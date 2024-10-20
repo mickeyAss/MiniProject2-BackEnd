@@ -123,6 +123,14 @@ class _SendProductPageState extends State<SendProductPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   FilledButton(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 72, 0, 0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
                     onPressed: () {
                       if (nameProduct.text.isNotEmpty &&
                           detailProduct.text.isNotEmpty &&

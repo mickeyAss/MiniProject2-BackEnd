@@ -34,6 +34,8 @@ class _ParcelReceicedRiderPageState extends State<ParcelReceicedRiderPage> {
   String deliveryStatusMessage =
       'กำลังดำเนินการจัดส่ง'; // ตัวแปรเก็บข้อความสถานะการจัดส่ง
 
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -227,20 +229,24 @@ class _ParcelReceicedRiderPageState extends State<ParcelReceicedRiderPage> {
                 ],
               ),
               padding: const EdgeInsets.all(16),
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 72, 0, 0),
-                  foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                onPressed: updateProStatus,
-                child: const Text(
-                  'เริ่มจัดส่งพัสดุ',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-              ),
+              child: isLoading
+                  ? CircularProgressIndicator() // แสดงการโหลด
+                  : FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 72, 0, 0),
+                        foregroundColor:
+                            const Color.fromARGB(255, 255, 255, 255),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: updateProStatus,
+                      child: const Text(
+                        'เริ่มจัดส่งพัสดุ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
+                      ),
+                    ),
             ),
           ),
         ],
@@ -288,6 +294,21 @@ class _ParcelReceicedRiderPageState extends State<ParcelReceicedRiderPage> {
 
   // ฟังก์ชันสำหรับอัปเดตสถานะ
   Future<void> updateProStatus() async {
+    if (imagePath == null) {
+      // ถ้ายังไม่มีการถ่ายรูป แสดงข้อความแจ้งเตือน
+      Get.snackbar(
+        'แจ้งเตือน',
+        'กรุณาถ่ายรูปภาพก่อนดำเนินการ',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return; // หยุดการทำงาน
+    }
+
+    setState(() {
+      isLoading = true; // เริ่มการโหลด
+    });
     // ดึง reference ไปที่ collection ชื่อ 'inbox'
     CollectionReference inboxCollection =
         FirebaseFirestore.instance.collection('inbox');
@@ -353,6 +374,9 @@ class _ParcelReceicedRiderPageState extends State<ParcelReceicedRiderPage> {
 
     if (updateStatus.statusCode == 200) {
       log('Status successfully updated to API');
+      setState(() {
+        isLoading = false; // เริ่มการโหลด
+      });
       Get.to(
         () => SendRederPage(
           rid: widget.rid,
