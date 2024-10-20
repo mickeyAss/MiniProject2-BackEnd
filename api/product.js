@@ -299,6 +299,42 @@ router.delete('/delete-all-status', (req, res) => {
 });
 
 
+// Route สำหรับอัพเดท pro_status โดยใช้ pid
+router.put('/update-status/:pid', (req, res) => {
+    const { pid } = req.params; // รับ pid จากพารามิเตอร์ URL
+    const { pro_status } = req.body; // รับ pro_status จาก body
+
+    // ตรวจสอบว่ามีการส่ง pro_status มาหรือไม่
+    if (!pro_status) {
+        return res.status(400).json({ error: 'Missing pro_status' });
+    }
+
+    try {
+        // Query สำหรับอัพเดทคอลัมน์ pro_status โดยใช้ pid ที่รับมา
+        const query = `UPDATE product SET pro_status = ? WHERE pid = ?`;
+
+        conn.query(query, [pro_status, pid], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Update query error' });
+            }
+
+            // ตรวจสอบว่ามีการอัพเดทข้อมูลสำเร็จหรือไม่
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'No product found with the provided pid' });
+            }
+
+            // ส่ง response กลับเมื่อทำการอัพเดทสำเร็จ
+            res.status(200).json({ message: 'Product status updated successfully' });
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+
 
 
 
