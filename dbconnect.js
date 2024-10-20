@@ -7,12 +7,6 @@ const conn = mysql.createConnection({
     database: 'web66_65011212028'
 })
 
-conn.connect((err) => {
-    if (err) {
-        console.log('Error connect toMySQL database = ', err)
-        return;
-    }
-    console.log('MySQl successfully connected!');
-})
+const queryAsync = util.promisify(conn.query).bind(conn);
 
-module.exports = conn;
+module.exports = {conn , queryAsync};
