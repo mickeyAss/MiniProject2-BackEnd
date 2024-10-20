@@ -36,6 +36,8 @@ class _SendRederPageState extends State<SendRederPage> {
   late Future<void> loadData_Rider;
   late StreamSubscription listener;
 
+  bool isLoading = true;
+
   @override
   void dispose() {
     listener.cancel(); // ปิดการฟังเมื่อไม่ใช้งาน
@@ -74,135 +76,148 @@ class _SendRederPageState extends State<SendRederPage> {
           ? const Center(child: CircularProgressIndicator())
           : Stack(
               children: [
-                FlutterMap(
-                  mapController: mapController,
-                  options: MapOptions(
-                    initialCenter: latLng!,
-                    initialZoom: 15.0,
-                    onMapReady: () {
-                      mapController.move(latLng!, 15.0);
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.app',
-                      maxNativeZoom: 19,
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        // Marker สำหรับตำแหน่งปัจจุบัน
-                        Marker(
-                          point: latLng!,
-                          width: 40,
-                          height: 40,
-                          child: const Icon(
-                            Icons.navigation,
-                            size: 30,
-                            color: Color.fromARGB(255, 0, 26, 128),
-                          ),
+                isLoading
+                    ? CircularProgressIndicator() // แสดงการโหลด
+                    : FlutterMap(
+                        mapController: mapController,
+                        options: MapOptions(
+                          initialCenter: latLng!,
+                          initialZoom: 15.0,
+                          onMapReady: () {
+                            mapController.move(latLng!, 15.0);
+                          },
                         ),
-                        ...markers, // เพิ่ม marker ที่มาจาก API
-                      ],
-                    ),
-                    // ปุ่มที่อยู่ติดขอบล่าง
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 255, 255, 255),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            topRight: Radius.circular(20),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName: 'com.example.app',
+                            maxNativeZoom: 19,
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 8,
-                              offset: Offset(0, -4),
+                          MarkerLayer(
+                            markers: [
+                              // Marker สำหรับตำแหน่งปัจจุบัน
+                              Marker(
+                                point: latLng!,
+                                width: 40,
+                                height: 40,
+                                child: const Icon(
+                                  Icons.navigation,
+                                  size: 30,
+                                  color: Color.fromARGB(255, 0, 26, 128),
+                                ),
+                              ),
+                              ...markers, // เพิ่ม marker ที่มาจาก API
+                            ],
+                          ),
+                          // ปุ่มที่อยู่ติดขอบล่าง
+                          Positioned(
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 255, 255, 255),
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  topRight: Radius.circular(20),
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    blurRadius: 8,
+                                    offset: Offset(0, -4),
+                                  ),
+                                ],
+                              ),
+                              padding: const EdgeInsets.all(16),
+                              child: getp.proStatus == 'รอไรเดอร์มารับ'
+                                  ? isWithinRange(
+                                          latLng!,
+                                          LatLng(
+                                              double.parse(
+                                                  getp.senderLatitude!),
+                                              double.parse(
+                                                  getp.senderLongitude!)),
+                                          50.0)
+                                      ? FilledButton(
+                                          style: FilledButton.styleFrom(
+                                            backgroundColor:
+                                                const Color.fromARGB(
+                                                    255, 72, 0, 0),
+                                            foregroundColor:
+                                                const Color.fromARGB(
+                                                    255, 255, 255, 255),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                          ),
+                                          onPressed: () {
+                                            Get.to(
+                                              () => ParcelReceicedRiderPage(
+                                                rid: widget.rid,
+                                                trackingNumber:
+                                                    widget.trackingNumber,
+                                              ),
+                                            );
+                                          },
+                                          child: const Text(
+                                            'รับพัสดุแล้ว',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        )
+                                      : const Text('โปรดรับพัสดุให้สำเร็จ')
+                                  : getp.proStatus == 'กำลังดำเนินการจัดส่ง'
+                                      ? isWithinRange(
+                                              latLng!,
+                                              LatLng(
+                                                  double.parse(
+                                                      getp.receiverLatitude!),
+                                                  double.parse(
+                                                      getp.receiverLongitude!)),
+                                              50.0)
+                                          ? FilledButton(
+                                              style: FilledButton.styleFrom(
+                                                backgroundColor:
+                                                    const Color.fromARGB(
+                                                        255, 72, 0, 0),
+                                                foregroundColor:
+                                                    const Color.fromARGB(
+                                                        255, 255, 255, 255),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                              onPressed: () {
+                                                Get.to(
+                                                  () => FinalRiderPage(
+                                                    rid: widget.rid,
+                                                    trackingNumber:
+                                                        widget.trackingNumber,
+                                                  ),
+                                                );
+                                              },
+                                              child: const Text(
+                                                'ดำเนินการต่อ',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                            )
+                                          : const Text(
+                                              'โปรดจัดส่งพัสดุให้สำเร็จ')
+                                      : const Text('สถานะไม่ถูกต้อง'),
                             ),
-                          ],
-                        ),
-                        padding: const EdgeInsets.all(16),
-                        child: getp.proStatus == 'รอไรเดอร์มารับ'
-                            ? isWithinRange(
-                                    latLng!,
-                                    LatLng(double.parse(getp.senderLatitude!),
-                                        double.parse(getp.senderLongitude!)),
-                                    50.0)
-                                ? FilledButton(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor:
-                                          const Color.fromARGB(255, 72, 0, 0),
-                                      foregroundColor: const Color.fromARGB(
-                                          255, 255, 255, 255),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                    onPressed: () {
-                                      Get.to(
-                                        () => ParcelReceicedRiderPage(
-                                          rid: widget.rid,
-                                          trackingNumber: widget.trackingNumber,
-                                        ),
-                                      );
-                                    },
-                                    child: const Text(
-                                      'รับพัสดุแล้ว',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  )
-                                : const Text('โปรดรับพัสดุให้สำเร็จ')
-                            : getp.proStatus == 'กำลังดำเนินการจัดส่ง'
-                                ? isWithinRange(
-                                        latLng!,
-                                        LatLng(
-                                            double.parse(
-                                                getp.receiverLatitude!),
-                                            double.parse(
-                                                getp.receiverLongitude!)),
-                                        50.0)
-                                    ? FilledButton(
-                                        style: FilledButton.styleFrom(
-                                          backgroundColor: const Color.fromARGB(
-                                              255, 72, 0, 0),
-                                          foregroundColor: const Color.fromARGB(
-                                              255, 255, 255, 255),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                         Get.to(
-                                        () => FinalRiderPage(
-                                          rid: widget.rid,
-                                          trackingNumber: widget.trackingNumber,
-                                        ),
-                                      );
-                                        },
-                                        child: const Text(
-                                          'ดำเนินการต่อ',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      )
-                                    : const Text('โปรดจัดส่งพัสดุให้สำเร็จ')
-                                : const Text('สถานะไม่ถูกต้อง'),
+                          )
+                        ],
                       ),
-                    )
-                  ],
-                ),
                 // Positioned สำหรับ FutureBuilder
                 Positioned(
                   top: 50.0,
@@ -265,6 +280,7 @@ class _SendRederPageState extends State<SendRederPage> {
 
             markers.add(senderMarker);
             mapController.move(LatLng(latitude, longitude), 15.0);
+            bool isLoading = false;
           } catch (e) {
             log('Error parsing sender latitude or longitude: $e');
           }
@@ -290,6 +306,7 @@ class _SendRederPageState extends State<SendRederPage> {
 
             markers.add(receiverMarker);
             mapController.move(LatLng(latitude, longitude), 15.0);
+            bool isLoading = false;
           } catch (e) {
             log('Error parsing receiver latitude or longitude: $e');
           }
@@ -310,6 +327,7 @@ class _SendRederPageState extends State<SendRederPage> {
     if (response.statusCode == 200) {
       getrider = getDataRiderFromJson(response.body);
       log(response.body);
+      bool isLoading = false;
     } else {
       log('Error loading rider data: ${response.statusCode}');
     }
