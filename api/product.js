@@ -4,6 +4,11 @@ var conn = require('../dbconnect')
 
 module.exports = router;
 
+const util = require('util');
+
+// แปลง conn.query เป็น Promise-based function
+const query = util.promisify(conn.query).bind(conn);
+
 // รับ tracking_number
 router.get("/get/:tracking_number", (req, res) => {
     const { tracking_number } = req.params; 
@@ -207,7 +212,7 @@ router.delete('/delete-all', (req, res) => {
 });
 
 // Route สำหรับเพิ่มข้อมูล status
-router.post('/add-status', (req, res) => {
+router.post('/add-status', async (req, res) => {
     const { uid_send, uid_accept, staname, tacking } = req.body; // รับข้อมูล trackingNumber ด้วย
 
     // ตรวจสอบข้อมูลที่รับเข้ามา
@@ -217,27 +222,23 @@ router.post('/add-status', (req, res) => {
 
     try {
         // Query สำหรับ insert ข้อมูลลงในตาราง status พร้อมกับ trackingNumber
-        const query = `INSERT INTO status (uid_send, uid_accept, staname, tacking) 
-                       VALUES (?, ?, ?, ?)`;
+        const insertQuery = `INSERT INTO status (uid_send, uid_accept, staname, tacking) 
+                             VALUES (?, ?, ?, ?)`;
         const values = [uid_send, uid_accept, staname, tacking];
 
-        conn.query(query, values, (err, result) => {
-            if (err) {
-                console.log(err);
-                return res.status(400).json({ error: 'Insert query error' });
-            }
+        const result = await query(insertQuery, values);
 
-            // ส่ง response กลับเมื่อทำการ insert สำเร็จ
-            res.status(201).json({ 
-                message: 'Status added successfully', 
-                statusId: result.insertId 
-            });
+        // ส่ง response กลับเมื่อทำการ insert สำเร็จ
+        res.status(201).json({ 
+            message: 'Status added successfully', 
+            statusId: result.insertId 
         });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 router.get("/get-status/:tacking", (req, res) => {
@@ -297,8 +298,9 @@ router.delete('/delete-all-status', (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 // Route สำหรับอัพเดท pro_status โดยใช้ pid
-router.put('/update-status/:pid', (req, res) => {
+router.put('/update-status/:pid', async (req, res) => {
     const { pid } = req.params; // รับ pid จากพารามิเตอร์ URL
     const { pro_status } = req.body; // รับ pro_status จาก body
 
@@ -309,27 +311,23 @@ router.put('/update-status/:pid', (req, res) => {
 
     try {
         // Query สำหรับอัพเดทคอลัมน์ pro_status โดยใช้ pid ที่รับมา
-        const query = `UPDATE product SET pro_status = ? WHERE pid = ?`;
+        const updateQuery = `UPDATE product SET pro_status = ? WHERE pid = ?`;
 
-        conn.query(query, [pro_status, pid], (err, result) => {
-            if (err) {
-                console.log(err);
-                return res.status(400).json({ error: 'Update query error' });
-            }
+        const result = await query(updateQuery, [pro_status, pid]);
 
-            // ตรวจสอบว่ามีการอัพเดทข้อมูลสำเร็จหรือไม่
-            if (result.affectedRows === 0) {
-                return res.status(404).json({ error: 'No product found with the provided pid' });
-            }
+        // ตรวจสอบว่ามีการอัพเดทข้อมูลสำเร็จหรือไม่
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'No product found with the provided pid' });
+        }
 
-            // ส่ง response กลับเมื่อทำการอัพเดทสำเร็จ
-            res.status(200).json({ message: 'Product stat updated successfully' });
-        });
+        // ส่ง response กลับเมื่อทำการอัพเดทสำเร็จ
+        res.status(200).json({ message: 'Product status updated successfully' });
     } catch (err) {
         console.log(err);
         return res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 
 
