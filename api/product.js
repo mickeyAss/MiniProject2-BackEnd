@@ -297,8 +297,6 @@ router.delete('/delete-all-status', (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
-
 // Route สำหรับอัพเดท pro_status โดยใช้ pid
 router.put('/update-status/:pid', (req, res) => {
     const { pid } = req.params; // รับ pid จากพารามิเตอร์ URL
@@ -325,7 +323,7 @@ router.put('/update-status/:pid', (req, res) => {
             }
 
             // ส่ง response กลับเมื่อทำการอัพเดทสำเร็จ
-            res.status(200).json({ message: 'Product status updated successfully' });
+            res.status(200).json({ message: 'Product stat updated successfully' });
         });
     } catch (err) {
         console.log(err);
