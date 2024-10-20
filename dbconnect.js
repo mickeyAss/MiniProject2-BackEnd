@@ -15,5 +15,4 @@ conn.connect((err) => {
     console.log('MySQl successfully connected!');
 })
 
-
-module.exports = {conn};
+module.exports = conn;
