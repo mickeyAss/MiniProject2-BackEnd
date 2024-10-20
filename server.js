@@ -1,3 +1,6 @@
 var app = require("./app");
 
-app.listen(3000,() => console.log('Server is running on port 3000'));
+// ใช้ process.env.PORT ถ้ามี หรือ fallback เป็นพอร์ต 3000 ถ้าไม่มีการกำหนด
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => console.log(`Server is running on port ${port}`));
