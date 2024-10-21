@@ -328,6 +328,72 @@ router.put('/update-status/:pid', async (req, res) => {
     }
 });
 
+router.get("/get-product-status/:tracking_number", (req, res) => {
+    const { tracking_number } = req.params; 
+
+    try {
+        const query = `
+            SELECT p.pid, p.pro_name, p.pro_detail, p.pro_img, p.pro_status, p.tracking_number, 
+                   p.uid_fk_send, p.uid_fk_accept, p.rid_fk,
+                   s.staname, s.tacking, s.uid_send, s.uid_accept,
+                   u_send.name AS sender_name, u_send.lastname AS sender_lastname, 
+                   u_accept.name AS receiver_name, u_accept.lastname AS receiver_lastname
+            FROM product p
+            LEFT JOIN status s ON p.tracking_number = s.tacking
+            LEFT JOIN users u_send ON p.uid_fk_send = u_send.uid
+            LEFT JOIN users u_accept ON p.uid_fk_accept = u_accept.uid
+            WHERE p.tracking_number = ?
+        `;
+
+        conn.query(query, [tracking_number], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'No product found with the provided tracking number' });
+            }
+
+            res.status(200).json(result[0]);
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+router.put('/update-rid/:pid', async (req, res) => {
+    const { pid } = req.params; // รับ pid จากพารามิเตอร์ URL
+    const { rid_fk } = req.body; // รับ rid_fk จาก body
+
+    // ตรวจสอบว่ามีการส่ง rid_fk มาหรือไม่
+    if (!rid_fk) {
+        return res.status(400).json({ error: 'Missing rid_fk' });
+    }
+
+    try {
+        // Query สำหรับอัพเดทคอลัมน์ rid_fk โดยใช้ pid ที่รับมา
+        const updateQuery = `UPDATE product SET rid_fk = ? WHERE pid = ?`;
+
+        const result = await query(updateQuery, [rid_fk, pid]);
+
+        // ตรวจสอบว่ามีการอัพเดทข้อมูลสำเร็จหรือไม่
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ error: 'No product found with the provided pid' });
+        }
+
+        // ส่ง response กลับเมื่อทำการอัพเดทสำเร็จ
+        res.status(200).json({ message: 'RID updated successfully' });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+
+
 
 
 
