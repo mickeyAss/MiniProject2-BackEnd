@@ -4,6 +4,25 @@ var conn = require('../dbconnect')
 
 module.exports = router;
 
+router.get("/get", (req, res) => {
+    try {
+        conn.query("SELECT * FROM users", (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'No users found' });
+            }
+            res.status(200).json(result); // ส่งข้อมูลผู้ใช้ทั้งหมด
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 router.get("/get/:uid", (req, res) => {
     const { uid } = req.params; // รับค่า uid จากพารามิเตอร์
 
