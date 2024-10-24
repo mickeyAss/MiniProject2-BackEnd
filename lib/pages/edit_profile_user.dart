@@ -108,11 +108,7 @@ class _EditProfileUserPageState extends State<EditProfileUserPage> {
                 Navigator.pop(context);
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.pin_drop_rounded),
-              title: const Text('ที่อยู่'),
-              onTap: () {},
-            ),
+
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout),

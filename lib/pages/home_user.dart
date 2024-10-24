@@ -112,11 +112,7 @@ class _HomeUserPageState extends State<HomeUserPage> {
                 Get.to(() => ProfileUser(uid: widget.uid));
               },
             ),
-            ListTile(
-              leading: Icon(Icons.pin_drop_rounded),
-              title: Text('ที่อยู่'),
-              onTap: () {},
-            ),
+
             Divider(),
             ListTile(
               leading: Icon(Icons.logout),

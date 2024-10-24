@@ -44,11 +44,16 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
     super.initState();
     loadData_User = loadDataUser();
     log(loadData_User.toString());
-    isSentItemsVisible = true; // แสดงเฉพาะรายการพัสดุที่จัดส่ง
-    isReceivedItemsVisible = false; // ซ่อนรายการพัสดุที่ได้รับ
+
+    // เริ่มต้นด้วยการแสดงรายการพัสดุที่จัดส่ง
+    isSentItemsVisible = true;
+    isReceivedItemsVisible = false;
+
+    // เรียกใช้งานฟังก์ชันที่ฟังการเปลี่ยนแปลงใน Firestore
     startRealtimeGet();
 
-    changeButtonColor(1); // เรียกใช้งานเพื่อเปลี่ยนสีปุ่ม
+    // เปลี่ยนสีปุ่มให้ถูกต้อง
+    changeButtonColor(1);
   }
 
   @override
@@ -203,26 +208,11 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
         children: [
           Container(
             color: const Color.fromARGB(255, 72, 0, 0),
-            height: 200,
+            height: 150,
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 50, 20, 10),
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "กรอกเลขพัสดุเพื่อตรวจสอบสถานะพัสดุ",
-                        hintStyle: const TextStyle(color: Colors.black38),
-                        filled: true,
-                        fillColor: Colors.white,
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        suffixIcon:
-                            const Icon(Icons.search, color: Colors.black38),
-                      ),
-                    ),
-                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -294,10 +284,11 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
                         Map<String, dynamic> firepro = document.data();
                         if (firepro['uid_fk_send'] == widget.uid) {
                           sentItems.add(firepro);
-                        } else {
+                        } else if (firepro['uid_fk_accept'] == widget.uid) {
                           receivedItems.add(firepro);
                         }
                       }
+                      log("Received Items: ${receivedItems.length}"); // เพิ่มบรรทัดนี้เพื่อตรวจสอบจำนวนพัสดุที่ได้รับ
 
                       return Column(
                         children: [
@@ -385,9 +376,12 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
                                             children: [
                                               TextButton(
                                                   onPressed: () {
-                                                    Get.to(() => DetailSendUserPage(
-                                                        track: firepro[
-                                                            'tracking_number']));
+                                                    Get.to(() =>
+                                                        DetailSendUserPage(
+                                                          track: firepro[
+                                                              'tracking_number'],
+                                                          uid: widget.uid,
+                                                        ));
                                                   },
                                                   child: const Text(
                                                     "ดูรายละเอียดเพิ่มเติม >",
@@ -488,7 +482,14 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
                                                 MainAxisAlignment.end,
                                             children: [
                                               TextButton(
-                                                  onPressed: () {},
+                                                  onPressed: () {
+                                                    Get.to(() =>
+                                                        DetailSendUserPage(
+                                                          track: firepro[
+                                                              'tracking_number'],
+                                                          uid: widget.uid,
+                                                        ));
+                                                  },
                                                   child: const Text(
                                                     "ดูรายละเอียดเพิ่มเติม >",
                                                     style: TextStyle(
@@ -521,28 +522,30 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
   void startRealtimeGet() {
     final inboxCollection = db.collection("inbox");
 
-    // ฟังข้อมูลทั้งหมดในคอลเล็กชัน inbox แบบเรียลไทม์
-    inboxCollection.snapshots().listen(
-      (snapshot) {
-        bool hasSentItems = false; // ตัวแปรเช็คว่ามีรายการพัสดุที่จัดส่งไหม
+    inboxCollection.snapshots().listen((snapshot) {
+      bool hasSentItems = false;
+      bool hasReceivedItems = false;
 
-        for (var document in snapshot.docs) {
-          Map<String, dynamic> data = document.data();
+      for (var document in snapshot.docs) {
+        Map<String, dynamic> data = document.data();
 
-          // เช็ค uid_fk_send กับ widget.uid เฉพาะรายการพัสดุที่จัดส่งเท่านั้น
-          if (data['uid_fk_send'] == widget.uid) {
-            hasSentItems = true; // ถ้ามีรายการพัสดุที่จัดส่งให้ปรับเป็น true
-          }
+        // เช็ค uid_fk_send กับ widget.uid เฉพาะรายการพัสดุที่จัดส่ง
+        if (data['uid_fk_send'] == widget.uid) {
+          hasSentItems = true;
         }
 
-        setState(() {
-          // ปรับสถานะการแสดงผลเฉพาะรายการพัสดุที่จัดส่ง
-          isSentItemsVisible = hasSentItems; // ถ้ามีรายการพัสดุที่จัดส่งจะแสดง
-          isReceivedItemsVisible = false; // ไม่สนใจพัสดุที่ได้รับ
-        });
-      },
-      onError: (error) => log("Listen failed: $error"),
-    );
+        // เช็ค uid_fk_receive กับ widget.uid เฉพาะรายการพัสดุที่ได้รับ
+        if (data['uid_fk_receive'] == widget.uid) {
+          hasReceivedItems = true;
+        }
+      }
+
+      setState(() {
+        // ปรับสถานะการแสดงผลทั้งพัสดุที่จัดส่งและได้รับ
+        isSentItemsVisible = hasSentItems;
+        isReceivedItemsVisible = hasReceivedItems;
+      });
+    }, onError: (error) => log("Listen failed: $error"));
   }
 
   void changeButtonColor(int buttonIndex) {

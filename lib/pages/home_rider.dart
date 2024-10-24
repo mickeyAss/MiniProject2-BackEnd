@@ -145,11 +145,7 @@ class _HomeRiderPageState extends State<HomeRiderPage> {
                 // Get.to(() => ProfileUser(uid: widget.uid));
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.pin_drop_rounded),
-              title: const Text('ที่อยู่'),
-              onTap: () {},
-            ),
+
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout),
@@ -577,6 +573,19 @@ class _HomeRiderPageState extends State<HomeRiderPage> {
         } else {
           log('Failed to post status: ${postResponse.body}');
           return; // หยุดการทำงานหาก POST ไม่สำเร็จ
+        }
+
+        final updaterid = await http.put(
+          Uri.parse("$url/product/update-rid/${documentId}"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({"rid_fk": widget.rid}),
+        );
+
+        if (updaterid.statusCode == 200) {
+          log('RID successfully updated to API');
+        } else {
+          log('Failed to update status: ${updaterid.body}');
+          return; // หยุดการทำงานหาก PUT ไม่สำเร็จ
         }
       } else {
         log('Document does not exist');

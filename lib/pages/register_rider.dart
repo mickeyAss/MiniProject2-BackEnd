@@ -44,228 +44,235 @@ class _RegisterRiderPageState extends State<RegisterRiderPage> {
               color: const Color.fromARGB(255, 128, 128, 128)),
         ),
         centerTitle: true,
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // แสดง CircularProgressIndicator เมื่อกำลังอัปโหลด
-            if (isUploading) CircularProgressIndicator(),
-            // ปุ่มสำหรับอัปโหลดภาพ
-            OutlinedButton(
-              onPressed: () async {
-                image = await picker.pickImage(source: ImageSource.gallery);
-                if (image != null) {
-                  log(image!.path.toString());
-                  setState(() {});
-                } else {
-                  log('No Image');
-                }
-              },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(
-                  color: Color.fromARGB(255, 72, 0, 0),
+      body: Container(
+        color: Color.fromARGB(255, 255, 255, 255),
+        width: double.infinity,
+        height: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              // แสดง CircularProgressIndicator เมื่อกำลังอัปโหลด
+              if (isUploading) CircularProgressIndicator(),
+              // ปุ่มสำหรับอัปโหลดภาพ
+              OutlinedButton(
+                onPressed: () async {
+                  image = await picker.pickImage(source: ImageSource.gallery);
+                  if (image != null) {
+                    log(image!.path.toString());
+                    setState(() {});
+                  } else {
+                    log('No Image');
+                  }
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(
+                    color: Color.fromARGB(255, 72, 0, 0),
+                  ),
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(
+                      0), // เอา padding ออกเพื่อให้รูปเต็มปุ่ม
                 ),
-                shape: const CircleBorder(),
-                padding: const EdgeInsets.all(
-                    0), // เอา padding ออกเพื่อให้รูปเต็มปุ่ม
-              ),
-              child: (image != null)
-                  ? ClipOval(
-                      // ใช้ ClipOval เพื่อให้ภาพเป็นวงกลม
-                      child: Image.file(
-                        File(image!.path),
-                        width: 100, // กำหนดขนาดของรูปที่แสดงในปุ่ม
-                        height: 100,
-                        fit: BoxFit.cover,
+                child: (image != null)
+                    ? ClipOval(
+                        // ใช้ ClipOval เพื่อให้ภาพเป็นวงกลม
+                        child: Image.file(
+                          File(image!.path),
+                          width: 100, // กำหนดขนาดของรูปที่แสดงในปุ่ม
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : const Icon(
+                        Icons.photo,
+                        color: Color.fromARGB(255, 72, 0, 0),
+                        size: 30, // ขนาดของไอคอน
                       ),
-                    )
-                  : const Icon(
-                      Icons.photo,
-                      color: Color.fromARGB(255, 72, 0, 0),
-                      size: 30, // ขนาดของไอคอน
+              ),
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30.0),
+                    child: Text(
+                      'สมัครสมาชิก',
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
-            ),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 30.0),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: TextField(
+                  controller: nameNoCt1,
+                  keyboardType: TextInputType.text,
+                  cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
+                  decoration: InputDecoration(
+                    hintText: 'ชื่อ',
+                    labelStyle: TextStyle(
+                      fontSize: 15, // ปรับขนาดของ label
+                    ),
+                    border: UnderlineInputBorder(),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.green,
+                      ), // สีของเส้นขอบเมื่อโฟกัส
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: TextField(
+                  controller: lastnameNoCt1,
+                  keyboardType: TextInputType.text,
+                  cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
+                  decoration: InputDecoration(
+                    hintText: 'นามสกุล',
+                    labelStyle: TextStyle(
+                      fontSize: 15, // ปรับขนาดของ label
+                    ),
+                    border: UnderlineInputBorder(),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.green,
+                      ), // สีของเส้นขอบเมื่อโฟกัส
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: TextField(
+                  controller: phoneNoCt1,
+                  keyboardType: TextInputType.phone,
+                  cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
+                  decoration: InputDecoration(
+                    hintText: 'เบอร์มือถือ',
+                    labelStyle: TextStyle(
+                      fontSize: 15, // ปรับขนาดของ label
+                    ),
+                    border: UnderlineInputBorder(),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.green,
+                      ), // สีของเส้นขอบเมื่อโฟกัส
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: TextField(
+                  controller: diveNoCt1,
+                  keyboardType: TextInputType.phone,
+                  cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
+                  decoration: InputDecoration(
+                    hintText: 'ทะเบียนรถ',
+                    labelStyle: TextStyle(
+                      fontSize: 15, // ปรับขนาดของ label
+                    ),
+                    border: UnderlineInputBorder(),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
+                    ),
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Colors.green,
+                      ), // สีของเส้นขอบเมื่อโฟกัส
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: TextField(
+                  obscureText: true,
+                  controller: passwordNoCt1,
+                  keyboardType: TextInputType.phone,
+                  cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
+                  decoration: InputDecoration(
+                      hintText: 'รหัสผ่าน',
+                      labelStyle: TextStyle(
+                        fontSize: 15, // ปรับขนาดของ label
+                      ),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.green,
+                        ), // สีของเส้นขอบเมื่อโฟกัส
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.never),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: TextField(
+                  obscureText: true,
+                  controller: conpasswordNoCt1,
+                  keyboardType: TextInputType.phone,
+                  cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
+                  decoration: InputDecoration(
+                      hintText: 'ยืนยันรหัสผ่าน',
+                      labelStyle: TextStyle(
+                        fontSize: 15, // ปรับขนาดของ label
+                      ),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.green,
+                        ), // สีของเส้นขอบเมื่อโฟกัส
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.never),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              FilledButton(
+                  onPressed: register,
+                  style: FilledButton.styleFrom(
+                    backgroundColor:
+                        Color.fromARGB(255, 72, 0, 0), // สีพื้นหลังของปุ่ม
+                    foregroundColor: Colors.white, // สีข้อความบนปุ่ม
+                    padding: EdgeInsets.only(left: 140, right: 140),
+                    elevation: 15,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0), // ปรับขอบมน
+                    ),
+                  ),
                   child: Text(
-                    'สมัครสมาชิก',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-              child: TextField(
-                controller: nameNoCt1,
-                keyboardType: TextInputType.text,
-                cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
-                decoration: InputDecoration(
-                  hintText: 'ชื่อ',
-                  labelStyle: TextStyle(
-                    fontSize: 15, // ปรับขนาดของ label
-                  ),
-                  border: UnderlineInputBorder(),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.green,
-                    ), // สีของเส้นขอบเมื่อโฟกัส
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.never,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-              child: TextField(
-                controller: lastnameNoCt1,
-                keyboardType: TextInputType.text,
-                cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
-                decoration: InputDecoration(
-                  hintText: 'นามสกุล',
-                  labelStyle: TextStyle(
-                    fontSize: 15, // ปรับขนาดของ label
-                  ),
-                  border: UnderlineInputBorder(),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.green,
-                    ), // สีของเส้นขอบเมื่อโฟกัส
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.never,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-              child: TextField(
-                controller: phoneNoCt1,
-                keyboardType: TextInputType.phone,
-                cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
-                decoration: InputDecoration(
-                  hintText: 'เบอร์มือถือ',
-                  labelStyle: TextStyle(
-                    fontSize: 15, // ปรับขนาดของ label
-                  ),
-                  border: UnderlineInputBorder(),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.green,
-                    ), // สีของเส้นขอบเมื่อโฟกัส
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.never,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-              child: TextField(
-                controller: diveNoCt1,
-                keyboardType: TextInputType.phone,
-                cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
-                decoration: InputDecoration(
-                  hintText: 'ทะเบียนรถ',
-                  labelStyle: TextStyle(
-                    fontSize: 15, // ปรับขนาดของ label
-                  ),
-                  border: UnderlineInputBorder(),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.green,
-                    ), // สีของเส้นขอบเมื่อโฟกัส
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.never,
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-              child: TextField(
-                obscureText: true,
-                controller: passwordNoCt1,
-                keyboardType: TextInputType.phone,
-                cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
-                decoration: InputDecoration(
-                    hintText: 'รหัสผ่าน',
-                    labelStyle: TextStyle(
-                      fontSize: 15, // ปรับขนาดของ label
-                    ),
-                    border: UnderlineInputBorder(),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.green,
-                      ), // สีของเส้นขอบเมื่อโฟกัส
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.never),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-              child: TextField(
-                obscureText: true,
-                controller: conpasswordNoCt1,
-                keyboardType: TextInputType.phone,
-                cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
-                decoration: InputDecoration(
-                    hintText: 'ยืนยันรหัสผ่าน',
-                    labelStyle: TextStyle(
-                      fontSize: 15, // ปรับขนาดของ label
-                    ),
-                    border: UnderlineInputBorder(),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
-                    ),
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Colors.green,
-                      ), // สีของเส้นขอบเมื่อโฟกัส
-                    ),
-                    floatingLabelBehavior: FloatingLabelBehavior.never),
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            FilledButton(
-                onPressed: register,
-                style: FilledButton.styleFrom(
-                  backgroundColor:
-                      Color.fromARGB(255, 72, 0, 0), // สีพื้นหลังของปุ่ม
-                  foregroundColor: Colors.white, // สีข้อความบนปุ่ม
-                  padding: EdgeInsets.only(left: 140, right: 140),
-                  elevation: 15,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0), // ปรับขอบมน
-                  ),
-                ),
-                child: Text(
-                  'ยืนยัน',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                )),
-          ],
+                    'ยืนยัน',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  )),
+            ],
+          ),
         ),
       ),
     );

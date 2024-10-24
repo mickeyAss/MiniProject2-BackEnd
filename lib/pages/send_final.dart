@@ -61,168 +61,205 @@ class _SendFinalPageState extends State<SendFinalPage> {
       appBar: AppBar(
         title: const Text(
           'ตรวจสอบข้อมูลการจัดส่ง',
-          style: TextStyle(fontSize: 20, color: Colors.black),
+          style: TextStyle(fontSize: 14, color: Colors.black54),
         ),
         centerTitle: true,
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              FutureBuilder(
-                future: loadData_User,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  }
-                  return SingleChildScrollView(
-                    child: Container(
+      body: Stack(
+        children: [
+          Container(
+            color: Color.fromARGB(255, 255, 255, 255),
+            width: double.infinity,
+            height: double.infinity,
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    FutureBuilder(
+                      future: loadData_User,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        }
+                        return SingleChildScrollView(
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: Colors.grey, width: 2), // ขอบกรอบ
+                              borderRadius: BorderRadius.circular(8), // มุมโค้ง
+                            ),
+                            padding: const EdgeInsets.all(10), // ระยะห่างภายใน
+                            child: Column(
+                              children: [
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'ผู้ส่ง: ${data.senderName} ${data.senderLastname}',
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '${data.senderPhone}',
+                                          style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black54),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '${data.senderAddress}',
+                                          style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black54),
+                                        ),
+                                      ],
+                                    ),
+                                    const Divider(
+                                        height: 30,
+                                        thickness: 1,
+                                        color: Colors.grey), // เส้นขั้น
+                                  ],
+                                ),
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          'ผู้รับ: ${data.receiverName} ${data.receiverLastname}',
+                                          style: const TextStyle(fontSize: 15),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '${data.receiverPhone}',
+                                          style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black54),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          '${data.receiverAddress}',
+                                          style: const TextStyle(
+                                              fontSize: 15,
+                                              color: Colors.black54),
+                                          softWrap: true,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
+                      child: Text(
+                        "รายการพัสดุ",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
                       decoration: BoxDecoration(
                         border:
                             Border.all(color: Colors.grey, width: 2), // ขอบกรอบ
                         borderRadius: BorderRadius.circular(8), // มุมโค้ง
                       ),
-                      padding: const EdgeInsets.all(10), // ระยะห่างภายใน
+                      padding: const EdgeInsets.fromLTRB(10, 10, 150, 10),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'ผู้ส่ง: ${data.senderName} ${data.senderLastname}',
-                                    style: const TextStyle(fontSize: 15),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '${data.senderPhone}',
-                                    style: const TextStyle(
-                                        fontSize: 15, color: Colors.black54),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '${data.senderAddress}',
-                                    style: const TextStyle(
-                                        fontSize: 15, color: Colors.black54),
-                                  ),
-                                ],
-                              ),
-                              const Divider(
-                                  height: 30,
-                                  thickness: 1,
-                                  color: Colors.grey), // เส้นขั้น
-                            ],
+                          const SizedBox(height: 10),
+                          Text(
+                            'ชื่อพัสดุ: ${widget.nameProduct}',
+                            style: const TextStyle(fontSize: 15),
                           ),
-                          Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Text(
-                                    'ผู้รับ: ${data.receiverName} ${data.receiverLastname}',
-                                    style: const TextStyle(fontSize: 15),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '${data.receiverPhone}',
-                                    style: const TextStyle(
-                                        fontSize: 15, color: Colors.black54),
-                                  ),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Text(
-                                    '${data.receiverAddress}',
-                                    style: const TextStyle(
-                                        fontSize: 15, color: Colors.black54),
-                                    softWrap: true,
-                                  ),
-                                ],
-                              ),
-                            ],
+                          Text(
+                            'รายละเอียด: ${widget.detailProduct}',
+                            style: const TextStyle(fontSize: 15),
                           ),
+                          const SizedBox(height: 10),
+                          widget.image != null
+                              ? Image.file(
+                                  File(widget.image!.path),
+                                  width: 200,
+                                  height: 200,
+                                  fit: BoxFit.cover,
+                                )
+                              : const Text('ไม่มีรูปภาพ'),
+                          const SizedBox(height: 20),
                         ],
                       ),
                     ),
-                  );
-                },
-              ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(10, 10, 0, 0),
-                child: Text(
-                  "รายการพัสดุ",
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey, width: 2), // ขอบกรอบ
-                  borderRadius: BorderRadius.circular(8), // มุมโค้ง
-                ),
-                padding: const EdgeInsets.fromLTRB(10, 10, 150, 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 10),
-                    Text(
-                      'ชื่อพัสดุ: ${widget.nameProduct}',
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                    Text(
-                      'รายละเอียด: ${widget.detailProduct}',
-                      style: const TextStyle(fontSize: 15),
-                    ),
-                    const SizedBox(height: 10),
-                    widget.image != null
-                        ? Image.file(
-                            File(widget.image!.path),
-                            width: 200,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          )
-                        : const Text('ไม่มีรูปภาพ'),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            isLoading
-                ? CircularProgressIndicator() // แสดงการโหลด
-                : FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 72, 0, 0),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 140, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 255, 255, 255),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 8,
+                    offset: Offset(0, -4),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.all(16),
+              child: isLoading
+                  ? CircularProgressIndicator() // แสดงการโหลด
+                  : FilledButton(
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 72, 0, 0),
+                        foregroundColor:
+                            const Color.fromARGB(255, 255, 255, 255),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                      onPressed: addProduct,
+                      child: const Text(
+                        'จัดส่ง',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 15),
                       ),
                     ),
-                    onPressed: addProduct,
-                    child: const Text("ทำการจัดส่ง"),
-                  ),
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }

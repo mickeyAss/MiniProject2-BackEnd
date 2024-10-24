@@ -65,64 +65,44 @@ class _LoginUserPageState extends State<LoginUserPage> {
             );
           },
         ),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 25, bottom: 30),
-                child: Image.asset(
-                  'assets/images/login.png',
-                  width: 50,
+      body: Container(
+        color: Color.fromARGB(255, 255, 255, 255),
+        width: double.infinity,
+        height: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 25, bottom: 30),
+                  child: Image.asset(
+                    'assets/images/login.png',
+                    width: 50,
+                  ),
                 ),
               ),
-            ),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 30.0),
-                  child: Text(
-                    'เข้าสู่ระบบ',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30.0),
+                    child: Text(
+                      'เข้าสู่ระบบ',
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-              child: TextField(
-                controller: phoneNoCt1,
-                keyboardType: TextInputType.phone,
-                cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
-                decoration: InputDecoration(
-                  hintText: 'เบอร์มือถือ',
-                  labelStyle: TextStyle(
-                    fontSize: 15, // ปรับขนาดของ label
-                  ),
-                  border: UnderlineInputBorder(),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.green,
-                    ), // สีของเส้นขอบเมื่อโฟกัส
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.never,
-                ),
+                ],
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0, right: 30.0),
-              child: TextField(
-                obscureText: true,
-                controller: passwordNoCt1,
-                keyboardType: TextInputType.phone,
-                cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
-                decoration: InputDecoration(
-                    hintText: 'รหัสผ่าน',
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: TextField(
+                  controller: phoneNoCt1,
+                  keyboardType: TextInputType.phone,
+                  cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
+                  decoration: InputDecoration(
+                    hintText: 'เบอร์มือถือ',
                     labelStyle: TextStyle(
                       fontSize: 15, // ปรับขนาดของ label
                     ),
@@ -136,58 +116,85 @@ class _LoginUserPageState extends State<LoginUserPage> {
                         color: Colors.green,
                       ), // สีของเส้นขอบเมื่อโฟกัส
                     ),
-                    floatingLabelBehavior: FloatingLabelBehavior.never),
-              ),
-            ),
-            SizedBox(
-              height: 30,
-            ),
-            FilledButton(
-                onPressed: loginuser,
-                style: FilledButton.styleFrom(
-                  backgroundColor:
-                      Color.fromARGB(255, 72, 0, 0), // สีพื้นหลังของปุ่ม
-                  foregroundColor: Colors.white, // สีข้อความบนปุ่ม
-                  padding: EdgeInsets.only(left: 125, right: 125),
-                  elevation: 15,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0), // ปรับขอบมน
+                    floatingLabelBehavior: FloatingLabelBehavior.never,
                   ),
                 ),
-                child: Text(
-                  'เข้าสู่ระบบ',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                )),
-            Padding(
-              padding:
-                  const EdgeInsets.only(top: 300), // เว้นระยะห่างจากขอบล่าง
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('คุณยังไม่มีบัญชี?'),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegisterUserPage()),
-                      );
-                    },
-                    child: Text(
-                      'ลงทะเบียน',
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 72, 0, 0), // สีข้อความ
-                        fontWeight: FontWeight.bold, // เพิ่มความหนา
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 30.0, right: 30.0),
+                child: TextField(
+                  obscureText: true,
+                  controller: passwordNoCt1,
+                  keyboardType: TextInputType.phone,
+                  cursorColor: Colors.green, // เปลี่ยนสีของเคอร์เซอร์
+                  decoration: InputDecoration(
+                      hintText: 'รหัสผ่าน',
+                      labelStyle: TextStyle(
+                        fontSize: 15, // ปรับขนาดของ label
                       ),
+                      border: UnderlineInputBorder(),
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors.grey), // สีของเส้นขอบเมื่อใช้งาน
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.green,
+                        ), // สีของเส้นขอบเมื่อโฟกัส
+                      ),
+                      floatingLabelBehavior: FloatingLabelBehavior.never),
+                ),
+              ),
+              SizedBox(
+                height: 30,
+              ),
+              FilledButton(
+                  onPressed: loginuser,
+                  style: FilledButton.styleFrom(
+                    backgroundColor:
+                        Color.fromARGB(255, 72, 0, 0), // สีพื้นหลังของปุ่ม
+                    foregroundColor: Colors.white, // สีข้อความบนปุ่ม
+                    padding: EdgeInsets.only(left: 125, right: 125),
+                    elevation: 15,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0), // ปรับขอบมน
                     ),
                   ),
-                ],
+                  child: Text(
+                    'เข้าสู่ระบบ',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  )),
+              Padding(
+                padding:
+                    const EdgeInsets.only(top: 300), // เว้นระยะห่างจากขอบล่าง
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('คุณยังไม่มีบัญชี?'),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => RegisterUserPage()),
+                        );
+                      },
+                      child: Text(
+                        'ลงทะเบียน',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 72, 0, 0), // สีข้อความ
+                          fontWeight: FontWeight.bold, // เพิ่มความหนา
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

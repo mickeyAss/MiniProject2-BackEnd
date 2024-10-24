@@ -60,7 +60,7 @@ class _MapScreenPageState extends State<MapScreenPage> {
                                       location.latitude, location.longitude);
                                 },
                                 child: const Icon(
-                                  Icons.pin_drop,
+                                  Icons.location_on,
                                   size: 40,
                                   color: Color.fromARGB(255, 11, 0, 215),
                                 ),
