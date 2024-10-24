@@ -53,16 +53,16 @@ router.get("/get/:tracking_number", (req, res) => {
 });
 
 
-router.get("/receiver/:uid_fk_accept", (req, res) => {
-    const { uid_fk_accept } = req.params;
+router.get("/sender/:uid_fk_send", (req, res) => {
+    const { uid_fk_send } = req.params;
 
-    // ตรวจสอบว่า uid_fk_accept มีค่าไหม
-    if (!uid_fk_accept) {
-        return res.status(400).json({ error: 'Receiver UID is required' });
+    // ตรวจสอบว่า uid_fk_send มีค่าไหม
+    if (!uid_fk_send) {
+        return res.status(400).json({ error: 'Sender UID is required' });
     }
 
     try {
-        // คิวรีข้อมูลจากเทเบิล product โดยใช้ uid_fk_accept และทำการ JOIN กับ users และ rider
+        // คิวรีข้อมูลจากเทเบิล product โดยใช้ uid_fk_send และทำการ JOIN กับ users และ rider
         const query = `
             SELECT p.pid, p.pro_name, p.pro_detail, p.pro_img, p.pro_status, p.tracking_number, 
                    p.uid_fk_send, p.uid_fk_accept, p.rid_fk,
@@ -77,16 +77,16 @@ router.get("/receiver/:uid_fk_accept", (req, res) => {
             LEFT JOIN users u_send ON p.uid_fk_send = u_send.uid
             LEFT JOIN users u_accept ON p.uid_fk_accept = u_accept.uid
             LEFT JOIN rider r ON p.rid_fk = r.rid
-            WHERE p.uid_fk_accept = ?
+            WHERE p.uid_fk_send = ?
         `;
 
-        conn.query(query, [uid_fk_accept], (err, result) => {
+        conn.query(query, [uid_fk_send], (err, result) => {
             if (err) {
                 console.log(err);
                 return res.status(400).json({ error: 'Query error' });
             }
             if (result.length === 0) {
-                return res.status(404).json({ error: 'No products found for this receiver UID' });
+                return res.status(404).json({ error: 'No products found for this sender UID' });
             }
             // ส่งผลลัพธ์กลับ
             res.status(200).json(result); 
@@ -96,7 +96,6 @@ router.get("/receiver/:uid_fk_accept", (req, res) => {
         return res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 
 router.get("/get-latest", (req, res) => {
