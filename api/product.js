@@ -97,6 +97,50 @@ router.get("/sender/:uid_fk_send", (req, res) => {
     }
 });
 
+router.get("/receiver/:uid_fk_accept", (req, res) => {
+    const { uid_fk_accept } = req.params;
+
+    // ตรวจสอบว่า uid_fk_accept มีค่าไหม
+    if (!uid_fk_accept) {
+        return res.status(400).json({ error: 'Receiver UID is required' });
+    }
+
+    try {
+        // คิวรีข้อมูลจากเทเบิล product โดยใช้ uid_fk_accept และทำการ JOIN กับ users และ rider
+        const query = `
+            SELECT p.pid, p.pro_name, p.pro_detail, p.pro_img, p.pro_status, p.tracking_number, 
+                   p.uid_fk_send, p.uid_fk_accept, p.rid_fk,
+                   u_send.name AS sender_name, u_send.lastname AS sender_lastname, 
+                   u_send.phone AS sender_phone, u_send.address AS sender_address, 
+                   u_send.latitude AS sender_latitude, u_send.longitude AS sender_longitude,
+                   u_accept.name AS receiver_name, u_accept.lastname AS receiver_lastname, 
+                   u_accept.phone AS receiver_phone, u_accept.address AS receiver_address,
+                   u_accept.latitude AS receiver_latitude, u_accept.longitude AS receiver_longitude,
+                   r.name AS rider_name, r.lastname AS rider_lastname, r.phone AS rider_phone
+            FROM product p
+            LEFT JOIN users u_send ON p.uid_fk_send = u_send.uid
+            LEFT JOIN users u_accept ON p.uid_fk_accept = u_accept.uid
+            LEFT JOIN rider r ON p.rid_fk = r.rid
+            WHERE p.uid_fk_accept = ?
+        `;
+
+        conn.query(query, [uid_fk_accept], (err, result) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).json({ error: 'Query error' });
+            }
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'No products found for this receiver UID' });
+            }
+            // ส่งผลลัพธ์กลับ
+            res.status(200).json(result); 
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
 
 router.get("/get-latest", (req, res) => {
     try {
