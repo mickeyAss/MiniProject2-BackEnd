@@ -9,6 +9,7 @@ import 'package:fontend_miniproject2/config/config.dart';
 import 'package:fontend_miniproject2/pages/home_user.dart';
 import 'package:fontend_miniproject2/pages/profile_user.dart';
 import 'package:fontend_miniproject2/pages/select_login.dart';
+import 'package:fontend_miniproject2/pages/detail_recriver.dart';
 import 'package:fontend_miniproject2/models/get_data_users.dart';
 import 'package:fontend_miniproject2/pages/detail_send_user.dart';
 
@@ -139,11 +140,7 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
                 Get.to(() => ProfileUser(uid: widget.uid));
               },
             ),
-            ListTile(
-              leading: const Icon(Icons.pin_drop_rounded),
-              title: const Text('ที่อยู่'),
-              onTap: () {},
-            ),
+
             const Divider(),
             ListTile(
               leading: const Icon(Icons.logout),
@@ -365,6 +362,22 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
                                               ),
                                             ],
                                           ),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                "พัสดุ : ",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                firepro['pro_name'].toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
                                           const SizedBox(
                                             height: 5,
                                           ),
@@ -475,6 +488,25 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
                                           const SizedBox(
                                             height: 5,
                                           ),
+                                          Row(
+                                            children: [
+                                              const Text(
+                                                "พัสดุ : ",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.bold),
+                                              ),
+                                              Text(
+                                                firepro['pro_name'].toString(),
+                                                style: const TextStyle(
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                          const SizedBox(
+                                            height: 5,
+                                          ),
                                           Text(firepro['tracking_number']
                                               .toString()),
                                           Row(
@@ -484,10 +516,12 @@ class _ProductListUserPageState extends State<ProductListUserPage> {
                                               TextButton(
                                                   onPressed: () {
                                                     Get.to(() =>
-                                                        DetailSendUserPage(
+                                                        DetailRecriverPafe(
                                                           track: firepro[
                                                               'tracking_number'],
                                                           uid: widget.uid,
+                                                          uid_recriver: firepro[
+                                                              'receiver_uid'],
                                                         ));
                                                   },
                                                   child: const Text(
